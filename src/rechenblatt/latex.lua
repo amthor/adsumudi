@@ -78,24 +78,25 @@ local function template_tasks(list)
 end
 
 --- Builds the complete .tex document.
--- @param list task list from tasks.generate_list
--- @param opts {min, max, operations, minutes?, solutions?, title?, debug?, sheet_code?}
---             sheet_code appears in the footer of page 1 as "Blattcode".
-function M.render(list, opts)
-	local title = M.escape(opts.title or "Rechenblatt")
+-- @param sheet        result of sheet.generate:
+--                     {tasks, operations, min, max, minutes?, code}
+-- @param presentation {title?, solutions?, debug?}
+function M.render(sheet, presentation)
+	presentation = presentation or {}
+	local title = M.escape(presentation.title or "Rechenblatt")
 	local pages = { { titel = title, loesung = false } }
-	if opts.solutions then
+	if presentation.solutions then
 		pages[2] = { titel = title .. " -- Lösungen", loesung = true }
 	end
 	return template()({
 		seiten = pages,
-		aufgaben = template_tasks(list),
-		blattcode = opts.sheet_code and M.escape(opts.sheet_code),
+		aufgaben = template_tasks(sheet.tasks),
+		blattcode = sheet.code and M.escape(sheet.code),
 		operator = OPERATOR,
-		beschreibung = describe_sheet(opts.operations, opts.min, opts.max),
-		minuten = opts.minutes and (tostring(opts.minutes):gsub("%.0$", "")),
-		stellen = M.digit_count(opts.min, opts.max),
-		debug = opts.debug or false,
+		beschreibung = describe_sheet(sheet.operations, sheet.min, sheet.max),
+		minuten = sheet.minutes and (tostring(sheet.minutes):gsub("%.0$", "")),
+		stellen = M.digit_count(sheet.min, sheet.max),
+		debug = presentation.debug or false,
 	})
 end
 

@@ -125,7 +125,7 @@ function M.generate_list(opts, rnd)
       local candidate = M.generate(op, opts.min, opts.max, rnd)
       if not candidate then
         error(("Rechenart '%s' ist im Zahlenbereich %d-%d nicht möglich")
-          :format(op, opts.min, opts.max))
+          :format(op, opts.min, opts.max), 0)
       end
       task = candidate
       if not seen[key(candidate)] then break end
