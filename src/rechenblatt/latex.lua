@@ -1,9 +1,9 @@
--- Fills the LaTeX template (templates/rechenblatt.tex.etlua) with a task list.
--- The layout lives entirely in the template; this module only prepares the data.
--- The variables visible to the template deliberately have German names
--- (seiten, aufgaben, blattcode, ...); everything internal is named in English.
+-- LaTeX backend: fills templates/rechenblatt.tex.etlua with the template view
+-- (view.lua) and adds what is LaTeX-specific: escaping and TeX operator symbols.
+-- The layout lives entirely in the template.
 
 local etlua = require("etlua")
+local view = require("rechenblatt.view")
 
 local M = {}
 
@@ -12,13 +12,6 @@ local OPERATOR = {
 	sub = "-",
 	mul = "\\cdot",
 	div = ":",
-}
-
-local OPERATION_NAMES = {
-	add = "Plus",
-	sub = "Minus",
-	mul = "Mal",
-	div = "Geteilt",
 }
 
 -- The template is located relative to this module: src/rechenblatt/ -> ../../templates/
@@ -54,50 +47,15 @@ local function template()
 	return compiled
 end
 
-local function describe_sheet(operations, min, max)
-	local names = {}
-	for _, op in ipairs(operations) do
-		names[#names + 1] = OPERATION_NAMES[op]
-	end
-	return ("%s im Zahlenraum %d bis %d"):format(table.concat(names, ", "), min, max)
-end
-
---- Maximum number of digits in the number range; determines the width of the number boxes.
--- Operands and results never exceed max (see tasks.lua).
-function M.digit_count(min, max)
-	return math.max(#tostring(math.floor(min)), #tostring(math.floor(max)))
-end
-
--- Translate tasks into the template's view: {art, a, b, ergebnis}.
-local function template_tasks(list)
-	local result = {}
-	for i, task in ipairs(list) do
-		result[i] = { art = task.op, a = task.a, b = task.b, ergebnis = task.result }
-	end
-	return result
-end
-
 --- Builds the complete .tex document.
--- @param sheet        result of sheet.generate:
---                     {tasks, operations, min, max, minutes?, code}
+-- @param sheet        result of sheet.generate
 -- @param presentation {title?, solutions?, debug?}
 function M.render(sheet, presentation)
-	presentation = presentation or {}
-	local title = M.escape(presentation.title or "Rechenblatt")
-	local pages = { { titel = title, loesung = false } }
-	if presentation.solutions then
-		pages[2] = { titel = title .. " -- Lösungen", loesung = true }
-	end
-	return template()({
-		seiten = pages,
-		aufgaben = template_tasks(sheet.tasks),
-		blattcode = sheet.code and M.escape(sheet.code),
-		operator = OPERATOR,
-		beschreibung = describe_sheet(sheet.operations, sheet.min, sheet.max),
-		minuten = sheet.minutes and (tostring(sheet.minutes):gsub("%.0$", "")),
-		stellen = M.digit_count(sheet.min, sheet.max),
-		debug = presentation.debug or false,
-	})
+	local data = view.build(sheet, presentation)
+	data.titel = M.escape(data.titel)
+	data.blattcode = data.blattcode and M.escape(data.blattcode)
+	data.operator = OPERATOR
+	return template()(data)
 end
 
 return M
