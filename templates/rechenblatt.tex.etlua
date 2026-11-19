@@ -59,7 +59,7 @@
 
 \vspace{0.8cm}
 \begin{center}
-  {\LARGE\bfseries <%- seite.titel %>}\\[0.3em]
+  {\LARGE\bfseries <%- titel %><% if seite.loesung then %> -- Lösungen<% end %>}\\[0.3em]
   {\normalsize <%- beschreibung %><% if minuten then %> \textbullet\ Zeit: etwa <%- minuten %> Minuten<% end %>}
 \end{center}
 \vspace{0.5cm}
