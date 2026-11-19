@@ -1,4 +1,5 @@
 local latex = require("rechenblatt.latex")
+local view = require("rechenblatt.view")
 
 describe("latex.render", function()
   local sheet = {
@@ -39,10 +40,10 @@ describe("latex.render", function()
   end)
 
   it("berechnet die Zahlenbreite aus der maximalen Stellenzahl", function()
-    assert.are.equal(1, latex.digit_count(1, 9))
-    assert.are.equal(2, latex.digit_count(1, 99))
-    assert.are.equal(3, latex.digit_count(1, 100))
-    assert.are.equal(4, latex.digit_count(10, 1000))
+    assert.are.equal(1, view.digit_count(1, 9))
+    assert.are.equal(2, view.digit_count(1, 99))
+    assert.are.equal(3, view.digit_count(1, 100))
+    assert.are.equal(4, view.digit_count(10, 1000))
     local tex = latex.render(sheet)
     assert.truthy(tex:find("\\setlength{\\zahlbreite}{3\\ziffernbreite}", 1, true))
   end)
