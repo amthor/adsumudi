@@ -1,0 +1,75 @@
+\documentclass[14pt,a4paper]{extarticle}
+\usepackage[ngerman]{babel}
+\usepackage[margin=2cm]{geometry}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+% Schrift (lualatex): Fira Sans für Text, passend Fira Math für Zahlen und Rechenzeichen
+\usepackage{fontspec}
+\usepackage{unicode-math}
+<% if debug then %>
+% Debug-Modus (--debug): Boxen, Glue und Kerns sichtbar machen
+\usepackage{lua-visual-debug}
+<% end %>
+\setmainfont{Fira Sans}
+\setmathfont{Fira Math}
+% Kräftigere Rechenzeichen: eigene Mathe-Version mit künstlicher Fettung (nur für \aufgabe-Operatoren)
+\setmathfont{Fira Math}[version=fett, FakeBold=1]
+% Fußzeile: mittig „Seite / Seitenzahl“ auf jeder Seite
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\cfoot{\thepage\ / \pageref{LastPage}}
+% Erste Seite: zusätzlich rechts der Blattcode (Seed)
+\fancypagestyle{ersteseite}{%
+  \fancyhf{}%
+  \cfoot{\thepage\ / \pageref{LastPage}}%
+<% if blattcode then %>
+  \rfoot{\footnotesize Blattcode: <%- blattcode %>}%
+<% end %>
+}
+\setlength{\columnsep}{1.5cm}
+\setlist[enumerate]{label=\small(\arabic*.),itemsep=1.1em}
+
+% Antwortlücke
+\newcommand{\luecke}{\underline{\hspace{2.2cm}}}
+% Breite der Zahlenboxen: angenommene Breite einer Ziffer mal maximale Stellenzahl
+% im Zahlenbereich. Für alle Aufgaben gleich, damit die Spalten einheitlich aussehen.
+\newlength{\ziffernbreite}
+\setlength{\ziffernbreite}{0.7em}
+\newlength{\zahlbreite}
+\setlength{\zahlbreite}{<%- stellen %>\ziffernbreite}
+
+% \aufgabe{a}{Operator}{b}{Lücke oder Lösung}
+\newcommand{\aufgabe}[4]{%
+  \hspace{1em}%
+  \makebox[\zahlbreite][c]{$#1$}%
+  \makebox[0.6cm][c]{{\mathversion{fett}$#2$}}%
+  \makebox[\zahlbreite][c]{$#3$}%
+  \makebox[0.8cm][c]{$=$}#4}
+
+\begin{document}
+\thispagestyle{ersteseite}
+<% for i, seite in ipairs(seiten) do %>
+<% if i > 1 then %>
+\newpage
+<% end %>
+\noindent Name: \underline{\hspace{6cm}} \hfill Datum: \underline{\hspace{3.5cm}}
+
+\vspace{0.8cm}
+\begin{center}
+  {\LARGE\bfseries <%- seite.titel %>}\\[0.3em]
+  {\normalsize <%- beschreibung %><% if minuten then %> \textbullet\ Zeit: etwa <%- minuten %> Minuten<% end %>}
+\end{center}
+\vspace{0.5cm}
+
+\begin{multicols}{2}
+\begin{enumerate}
+<% for _, a in ipairs(aufgaben) do %>
+  \item \aufgabe{<%- a.a %>}{<%- operator[a.art] %>}{<%- a.b %>}{<% if seite.loesung then %>\textbf{<%- a.ergebnis %>}<% else %>\luecke<% end %>}
+<% end %>
+\end{enumerate}
+\end{multicols}
+<% end %>
+\end{document}

@@ -1,0 +1,8 @@
+# Generierte Blätter und LaTeX-Hilfsdateien
+*.tex
+*.pdf
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
