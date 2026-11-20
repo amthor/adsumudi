@@ -1,22 +1,29 @@
 # Rechenblatt
 
-Erzeugt Mathe-Übungsblätter (3. Klasse) zum selbständigen Üben als LaTeX-Datei bzw. PDF.
+Erzeugt Mathe-Übungsblätter (3. Klasse) zum selbständigen Üben als PDF. Gesetzt wird mit
+[Typst](https://typst.app); LaTeX steht als Alternative zur Verfügung.
 
 ## Voraussetzungen
 
 - Lua 5.3 oder neuer
-- Template-Engine [etlua](https://github.com/leafo/etlua): `luarocks install --local etlua`
-  (oder alle Abhängigkeiten: `luarocks install --local --only-deps rechenblatt-dev-1.rockspec`)
-- lualatex mit den Paketen `extsizes`, `babel` (ngerman), `geometry`, `multicol`, `enumitem`, `fontspec`, `unicode-math` und den Schriften Fira Sans und Fira Math (alle in TeX Live enthalten)
+- [Typst](https://github.com/typst/typst), z. B. `cargo install --locked typst-cli`.
+  Die Schriften (Fira Sans, SIL Open Font License) liegen in `fonts/` bei.
+- [dkjson](http://dkolf.de/dkjson-lua/) liegt in `dkjson/` bei.
+- Nur für `--satz latex`:
+  - die Template-Engine [etlua](https://github.com/leafo/etlua): `luarocks install --local etlua`
+  - lualatex mit den Paketen `extsizes`, `babel` (ngerman), `geometry`, `multicol`, `enumitem`,
+    `fancyhdr`, `lastpage`, `fontspec`, `unicode-math` und den Schriften Fira Sans und Fira Math
+    (alle in TeX Live enthalten)
 - optional zum Testen: [busted](https://lunarmodules.github.io/busted/)
 
 ## Benutzung
 
 ```sh
-lua rechenblatt.lua --pdf          # Voreinstellung: Plus/Minus, 1–100, für 5 Minuten
-lua rechenblatt.lua -r mul,div -n 30 -l --pdf   # 30 Mal-/Geteilt-Aufgaben mit Lösungsblatt
-lua rechenblatt.lua -r +,-,*,: -t 10 --max 50 --pdf
-lua rechenblatt.lua --hilfe        # alle Optionen
+lua rechenblatt.lua                    # Voreinstellung: Plus/Minus, 1–100, für 5 Minuten → rechenblatt.pdf
+lua rechenblatt.lua -r mul,div -n 30 -l -o mal.pdf   # 30 Mal-/Geteilt-Aufgaben mit Lösungsblatt
+lua rechenblatt.lua -r +,-,*,: -t 10 --max 50
+lua rechenblatt.lua --satz latex       # dasselbe Blatt mit LaTeX gesetzt
+lua rechenblatt.lua --hilfe            # alle Optionen
 ```
 
 | Option | Bedeutung | Standard |
@@ -26,11 +33,12 @@ lua rechenblatt.lua --hilfe        # alle Optionen
 | `--min N` / `--max N` | Zahlenbereich | 1 / 100 |
 | `-r`, `--rechenarten` | `add,sub,mul,div` oder `+,-,*,:` | `add,sub` |
 | `-l`, `--loesungen` | Lösungsblatt als zweite Seite | aus |
-| `-o`, `--ausgabe` | Ausgabedatei | `rechenblatt.tex` |
-| `-p`, `--pdf` | PDF mit lualatex erzeugen | aus |
+| `-o`, `--ausgabe` | Ausgabedatei | `rechenblatt.pdf` |
+| `--satz SYSTEM` | `typst` oder `latex` | `typst` |
+| `--quelle` | statt des PDFs nur die Quelle schreiben (`.json` bei Typst, `.tex` bei LaTeX) | aus |
 | `-c`, `--blattcode CODE` | Blatt aus dem Blattcode exakt nachbauen (siehe unten) | – |
 | `-s`, `--seed N` | Zufallsstartwert, v. a. für Tests | Uhrzeit |
-| `-d`, `--debug` | Boxen sichtbar machen (lua-visual-debug), `.log` behalten | aus |
+| `-d`, `--debug` | Boxen sichtbar machen (LaTeX: lua-visual-debug, `.tex`/`.log` behalten) | aus |
 
 ## Regeln für die Aufgaben
 
@@ -50,13 +58,13 @@ nach dem Erzeugen auf der Konsole ausgegeben. Mit ihm lässt sich das Blatt spä
 etwa um nachträglich die Lösungen zu drucken:
 
 ```sh
-lua rechenblatt.lua --blattcode 1-AS-1-100-22-48213 -l --pdf
+lua rechenblatt.lua --blattcode 1-AS-1-100-22-48213 -l
 ```
 
 Aufbau: `Version-Rechenarten-Min-Max-Anzahl-Seed`. Die Rechenarten sind A (Plus), S (Minus),
 M (Mal) und D (Geteilt), und zwar in der Reihenfolge, in der sie angegeben wurden. Der Code legt die
-Aufgaben fest, nicht die Aufmachung: `--titel`, `-l`, `-o` und `-p` dürfen frei kombiniert werden,
-`-r`, `--min`, `--max`, `-n`, `-t` und `-s` dagegen nicht.
+Aufgaben fest, nicht die Aufmachung: `--titel`, `-l`, `-o`, `--satz` und `--quelle` dürfen frei
+kombiniert werden, `-r`, `--min`, `--max`, `-n`, `-t` und `-s` dagegen nicht.
 
 Die Version am Anfang ist die des Aufgabengenerators. Erzeugt eine neuere Programmversion bei gleichen
 Eingaben andere Aufgaben, lehnt sie alte Codes mit einer Meldung ab, statt still ein anderes Blatt
@@ -64,12 +72,21 @@ zu liefern.
 
 ## Layout anpassen
 
-Das Aussehen des Blatts steht vollständig in `templates/rechenblatt.tex.etlua`, einer normalen
-LaTeX-Datei mit etlua-Platzhaltern: `<% lua-code %>` für Schleifen/Bedingungen, `<%- wert %>`
-für Werte. (Nicht `<%= %>` verwenden – das maskiert für HTML, nicht für LaTeX.)
+Das Aussehen des Blatts steht vollständig in `templates/rechenblatt.typ`. Lua liefert nur die Daten
+(als JSON). Ohne Daten von Lua zeigt das Template die Beispieldaten aus `templates/beispiel.json`,
+sodass sich das Layout live bearbeiten lässt:
 
-Die Breite der Zahlenboxen ist `\ziffernbreite` (0.75em) mal der maximalen Stellenzahl
-des Zahlenbereichs; der Wert pro Ziffer steht im Template.
+```sh
+typst watch --font-path fonts templates/rechenblatt.typ
+```
+
+Die Breite der Zahlenboxen ist `ziffernbreite` (0.7em) mal der maximalen Stellenzahl des
+Zahlenbereichs; die übrigen Breiten einer Aufgabe stehen als benannte Werte im Template.
+
+Das LaTeX-Template `templates/rechenblatt.tex.etlua` ist eine LaTeX-Datei mit etlua-Platzhaltern:
+`<% lua-code %>` für Schleifen/Bedingungen, `<%- wert %>` für Werte (nicht `<%= %>` – das maskiert
+für HTML, nicht für LaTeX). Layout-Änderungen müssen in beiden Templates nachgezogen werden, wenn beide
+Satzsysteme gleich aussehen sollen.
 
 ## Tests
 
