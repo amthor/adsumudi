@@ -1,14 +1,19 @@
--- Command line frontend: argv -> core API -> .tex file (-> PDF).
+-- Command line frontend: argv -> core API -> backend -> PDF (or source).
 --
--- Contains no domain logic of its own; it only connects args, sheet, latex
--- and pdf, and turns errors into German messages and an exit code.
+-- Contains no domain logic of its own; it only connects args, sheet and the
+-- selected backend (typst or latex), and turns errors into German messages
+-- and an exit code.
 
 local args = require("rechenblatt.args")
 local sheet = require("rechenblatt.sheet")
-local latex = require("rechenblatt.latex")
-local pdf = require("rechenblatt.pdf")
 
 local M = {}
+
+-- Backends share one interface: SOURCE_EXT, render(), build().
+local BACKENDS = {
+	typst = "rechenblatt.typst",
+	latex = "rechenblatt.latex",
+}
 
 --- Runs the CLI.
 -- @param argv   list of arguments
@@ -33,28 +38,40 @@ function M.main(argv, out, errout)
 		return 0
 	end
 
+	local backend = require(BACKENDS[opts.backend])
+	local output = opts.output
+		or (opts.source_only and "rechenblatt." .. backend.SOURCE_EXT or "rechenblatt.pdf")
+	if not opts.source_only and not output:match("%.pdf$") then
+		return fail("die Ausgabedatei muss auf .pdf enden (für die Quelle: --quelle)")
+	end
+
 	local result, err = sheet.generate(opts.settings)
 	if not result then
 		return fail(err)
 	end
 
-	local tex = latex.render(result, { title = opts.title, solutions = opts.solutions, debug = opts.debug })
-	local f, open_err = io.open(opts.output, "w")
-	if not f then
-		return fail(open_err)
+	local rendered, source =
+		pcall(backend.render, result, { title = opts.title, solutions = opts.solutions, debug = opts.debug })
+	if not rendered then
+		return fail(source)
 	end
-	f:write(tex)
-	f:close()
-	out:write(("%d Aufgaben geschrieben: %s\n"):format(#result.tasks, opts.output))
-	out:write("Blattcode: ", result.code, "\n")
 
-	if opts.pdf then
-		local pdf_path, pdf_err = pdf.build(opts.output, { keep_log = opts.debug })
-		if not pdf_path then
-			return fail(pdf_err)
+	if opts.source_only then
+		local f, open_err = io.open(output, "w")
+		if not f then
+			return fail(open_err)
 		end
-		out:write("PDF erzeugt: ", pdf_path, "\n")
+		f:write(source)
+		f:close()
+		out:write(("Quelle geschrieben (%d Aufgaben): %s\n"):format(#result.tasks, output))
+	else
+		local pdf_path, build_err = backend.build(source, output, { keep_files = opts.debug })
+		if not pdf_path then
+			return fail(build_err)
+		end
+		out:write(("PDF erzeugt (%d Aufgaben): %s\n"):format(#result.tasks, pdf_path))
 	end
+	out:write("Blattcode: ", result.code, "\n")
 	return 0
 end
 

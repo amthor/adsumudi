@@ -3,7 +3,10 @@
 // Die Daten kommen als JSON von Lua (src/rechenblatt/typst.lua) über
 //   typst compile --input daten='<json>' rechenblatt.typ blatt.pdf
 // Ohne --input wird beispiel.json verwendet, damit sich das Layout direkt
-// bearbeiten und mit `typst watch` live ansehen lässt.
+// bearbeiten und live ansehen lässt:
+//   typst watch --font-path fonts templates/rechenblatt.typ
+// beispiel.json neu erzeugen:
+//   lua rechenblatt.lua -t 5 -s 4711 -l --quelle -o templates/beispiel.json
 //
 // Felder: titel, beschreibung, minuten (Text oder none), blattcode (Text oder
 // none), stellen, debug, seiten ((loesung: bool), …),

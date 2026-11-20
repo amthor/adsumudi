@@ -6,18 +6,21 @@
 local M = {}
 
 -- Output/presentation defaults of the CLI (domain defaults: sheet.DEFAULTS).
+-- output = nil means: the CLI picks rechenblatt.pdf (or .json/.tex with --quelle).
 M.DEFAULTS = {
-	output = "rechenblatt.tex",
+	backend = "typst",
+	source_only = false,
 	title = "Rechenblatt",
 	solutions = false,
-	pdf = false,
 	debug = false,
 }
+
+M.BACKENDS = { typst = true, latex = true }
 
 M.HELP = [[
 Aufruf: lua rechenblatt.lua [Optionen]
 
-Erzeugt ein Mathe-Übungsblatt als LaTeX-Datei (optional als PDF).
+Erzeugt ein Mathe-Übungsblatt als PDF (Satz mit Typst, alternativ LaTeX).
 
 Optionen:
   -n, --anzahl N        Anzahl der Aufgaben (hat Vorrang vor --minuten)
@@ -27,21 +30,24 @@ Optionen:
   -r, --rechenarten L   Kommaliste aus add,sub,mul,div bzw. + - * :
                         (Standard: add,sub)
   -l, --loesungen       Lösungsblatt als zweite Seite anhängen
-  -o, --ausgabe DATEI   Ausgabedatei (Standard: rechenblatt.tex)
-  -p, --pdf             PDF mit lualatex erzeugen
+  -o, --ausgabe DATEI   Ausgabedatei (Standard: rechenblatt.pdf)
+      --satz SYSTEM     Satzsystem: typst (Standard) oder latex
+      --quelle          statt des PDFs nur die Quelle schreiben: die Daten
+                        als .json (typst) bzw. das Dokument als .tex (latex)
   -c, --blattcode CODE  Blatt aus dem Blattcode (Fußzeile) exakt nachbauen;
                         legt Rechenarten, Zahlenbereich, Anzahl und Seed fest
   -s, --seed N          Zufallsstartwert (für Tests; zum Nachbauen --blattcode)
       --titel TEXT      Überschrift (Standard: Rechenblatt)
   -d, --debug           Layout-Debugging: Boxen sichtbar machen
-                        (lua-visual-debug), .log-Datei behalten
+                        (latex: lua-visual-debug, .log-Datei behalten)
   -h, --hilfe           diese Hilfe anzeigen
 
 Beispiele:
-  lua rechenblatt.lua --pdf
-  lua rechenblatt.lua -r mul,div --max 100 -n 30 -l --pdf
-  lua rechenblatt.lua -r +,-,*,: -t 10 -o test.tex
-  lua rechenblatt.lua --blattcode 1-AS-1-100-22-48213 -l --pdf
+  lua rechenblatt.lua
+  lua rechenblatt.lua -r mul,div --max 100 -n 30 -l -o mal.pdf
+  lua rechenblatt.lua -r +,-,*,: -t 10 --satz latex
+  lua rechenblatt.lua --blattcode 1-AS-1-100-22-48213 -l
+  lua rechenblatt.lua -t 5 -s 4711 -l --quelle -o templates/beispiel.json
 ]]
 
 local ALIASES = {
@@ -94,7 +100,7 @@ local function number(name, value, integer)
 end
 
 --- Parses the arguments.
--- @return {settings, output, title, solutions, pdf, debug, help?}
+-- @return {settings, output?, backend, source_only, title, solutions, debug, help?}
 --         settings holds only what was given: {operations?, min?, max?,
 --         count?, minutes?, seed?, code?} (input for sheet.generate).
 -- Errors are raised via error(msg, 0).
@@ -142,8 +148,13 @@ function M.parse(args)
 			o.solutions = true
 		elseif a == "-o" or a == "--ausgabe" then
 			o.output = value(a)
-		elseif a == "-p" or a == "--pdf" then
-			o.pdf = true
+		elseif a == "--satz" then
+			o.backend = value(a):lower()
+			if not M.BACKENDS[o.backend] then
+				error("--satz erwartet typst oder latex, nicht '" .. o.backend .. "'", 0)
+			end
+		elseif a == "--quelle" then
+			o.source_only = true
 		elseif a == "-s" or a == "--seed" then
 			explicit[#explicit + 1] = "--seed"
 			settings.seed = number(a, value(a), true)
