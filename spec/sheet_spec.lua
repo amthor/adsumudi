@@ -45,6 +45,8 @@ describe("sheet.resolve", function()
 			{ minutes = 0 },
 			{ seed = 0x100000000 },
 			{ code = "9-AS-1-100-22-1" },
+			{ operations = {} },
+			{ operations = { "add", "wurzel" } },
 		}
 		for _, settings in ipairs(cases) do
 			local s, err = sheet.resolve(settings)
@@ -52,6 +54,13 @@ describe("sheet.resolve", function()
 			assert.are.equal("string", type(err))
 			assert.falsy(err:find("%-%-")) -- frontend-neutral: no CLI flags
 		end
+	end)
+
+	it("prüft die Rechenarten auch ohne CLI (z. B. für die Web-Oberfläche)", function()
+		local _, err = sheet.resolve({ operations = {} })
+		assert.are.equal("mindestens eine Rechenart muss gewählt sein", err)
+		_, err = sheet.resolve({ operations = { "add", "wurzel" } })
+		assert.are.equal("unbekannte Rechenart: wurzel", err)
 	end)
 end)
 
