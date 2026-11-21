@@ -29,7 +29,9 @@ function M.digit_count(min, max)
 	return math.max(#tostring(math.floor(min)), #tostring(math.floor(max)))
 end
 
-local function describe_sheet(operations, min, max)
+--- Short German description of a sheet, e.g. "Plus, Minus im Zahlenraum 1 bis 100".
+-- Shown under the title and in the web frontend's history.
+function M.describe(operations, min, max)
 	local names = {}
 	for _, op in ipairs(operations) do
 		names[#names + 1] = OPERATION_NAMES[op]
@@ -56,7 +58,7 @@ function M.build(sheet, presentation)
 		seiten = pages,
 		aufgaben = tasks,
 		blattcode = sheet.code,
-		beschreibung = describe_sheet(sheet.operations, sheet.min, sheet.max),
+		beschreibung = M.describe(sheet.operations, sheet.min, sheet.max),
 		minuten = sheet.minutes and (tostring(sheet.minutes):gsub("%.0$", "")),
 		stellen = M.digit_count(sheet.min, sheet.max),
 		debug = presentation.debug or false,

@@ -27,7 +27,20 @@ local function copy_list(list)
 	return result
 end
 
+local KNOWN_OPERATIONS = {}
+for _, op in ipairs(tasks.OPERATIONS) do
+	KNOWN_OPERATIONS[op] = true
+end
+
 local function validate(s)
+	if #s.operations == 0 then
+		error("mindestens eine Rechenart muss gewählt sein", 0)
+	end
+	for _, op in ipairs(s.operations) do
+		if not KNOWN_OPERATIONS[op] then
+			error("unbekannte Rechenart: " .. tostring(op), 0)
+		end
+	end
 	if s.min < 0 then
 		error("Min darf nicht negativ sein", 0)
 	end
