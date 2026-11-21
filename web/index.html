@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rechenblatt</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <!-- wasmoon only ships a UMD bundle: it defines the global `wasmoon`. -->
+  <script src="vendor/wasmoon/index.js"></script>
+  <script type="module" src="src/main.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Rechenblatt</h1>
+    <p id="status" class="status">Lade …</p>
+    <button id="generate" type="button" disabled>Blatt erzeugen</button>
+    <section id="result" hidden>
+      <p>Blattcode: <strong id="result-code"></strong> · <span id="result-count"></span> Aufgaben</p>
+      <p><a id="download">PDF herunterladen</a></p>
+      <iframe id="preview" title="Vorschau des Rechenblatts"></iframe>
+    </section>
+  </main>
+</body>
+</html>
