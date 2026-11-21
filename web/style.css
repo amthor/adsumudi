@@ -1,23 +1,56 @@
+/* The page borrows from a school exercise book: squared paper, ink blue,
+   correction red, and Fira Sans like the worksheet itself. */
+
+@font-face {
+  font-family: "Fira Sans";
+  src: url("fonts/FiraSans-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fira Sans";
+  src: url("fonts/FiraSans-SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fira Sans";
+  src: url("fonts/FiraSans-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
-  --text: #1d1d1f;
-  --muted: #6e6e73;
-  --background: #ffffff;
-  --surface: #f2f2f5;
-  --accent: #0a6cd6;
-  --error: #b3261e;
-  --error-surface: #fdecea;
+  --ink: #1b2a4a;
+  --muted: #5b6478;
+  --paper: #ffffff;
+  --grid: #e3eaf4;
+  --panel: #ffffff;
+  --border: #cfd8e6;
+  --accent: #1f4fbf;
+  --accent-contrast: #ffffff;
+  --accent-soft: #e8eefb;
+  --error: #c62828;
+  --error-soft: #fdeceb;
+  --radius: 10px;
   color-scheme: light dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #f5f5f7;
-    --muted: #a1a1a6;
-    --background: #1c1c1e;
-    --surface: #2c2c2e;
-    --accent: #4da3ff;
+    --ink: #e8ecf4;
+    --muted: #a3acbf;
+    --paper: #14161c;
+    --grid: #1e222c;
+    --panel: #1b1f28;
+    --border: #353c4c;
+    --accent: #85a8ff;
+    --accent-contrast: #0d1424;
+    --accent-soft: #232f4b;
     --error: #ff8a80;
-    --error-surface: #3a1f1d;
+    --error-soft: #3a1f1d;
   }
 }
 
@@ -25,61 +58,326 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
-  background: var(--background);
-  color: var(--text);
-  font: 17px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background-color: var(--paper);
+  /* squared paper, 5 mm boxes */
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 20px 20px;
+  font: 17px/1.45 "Fira Sans", system-ui, sans-serif;
 }
 
-main {
-  max-width: 48rem;
+.layout {
+  display: grid;
+  gap: 16px;
+  max-width: 72rem;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 16px;
 }
 
-h1 {
-  margin: 0.5rem 0 1rem;
-  font-size: 1.6rem;
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: 23rem minmax(0, 1fr);
+    grid-template-areas: "head head" "form result";
+    align-items: start;
+    gap: 24px;
+    padding: 24px;
+  }
+
+  .masthead {
+    grid-area: head;
+  }
+
+  #sheet-form {
+    grid-area: form;
+    position: sticky;
+    top: 24px;
+  }
+
+  .result {
+    grid-area: result;
+  }
 }
 
-button {
+.masthead h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.tagline {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.panel {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+/* Form ------------------------------------------------------------------- */
+
+fieldset.plain,
+fieldset.group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+fieldset.group {
+  margin-bottom: 20px;
+}
+
+legend {
+  margin-bottom: 8px;
+  padding: 0;
+  font-weight: 600;
+}
+
+.optional {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+fieldset:disabled .chips,
+fieldset:disabled .inline,
+fieldset:disabled .segmented {
+  opacity: 0.45;
+}
+
+.chips {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.chip {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px 6px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* The real checkbox covers the chip: clickable and keyboard-focusable, but invisible. */
+.chip input,
+.segmented input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.chip-symbol {
+  color: var(--ink);
+  font-size: 1.7rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+/* Fira Sans's middle dot is much smaller than its other operators. */
+.chip-symbol-dot {
+  font-size: 2.6rem;
+  line-height: 0.72; /* same box height as the other symbols: 1.7rem * 1.1 */
+}
+
+.chip:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.chip:has(input:checked) .chip-symbol {
+  color: var(--accent);
+}
+
+.chip:has(input:focus-visible),
+.segmented label:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+input[type="number"],
+input[type="text"] {
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
   font: inherit;
-  min-height: 2.75rem;
-  padding: 0.5rem 1.25rem;
-  border: none;
-  border-radius: 0.6rem;
+  font-variant-numeric: tabular-nums;
+}
+
+input[type="number"] {
+  width: 6.5rem;
+}
+
+input:focus-visible {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent-soft);
+}
+
+.segmented {
+  display: inline-flex;
+  margin-bottom: 10px;
+  padding: 3px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+}
+
+.segmented label {
+  position: relative;
+  padding: 6px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.segmented label:has(input:checked) {
   background: var(--accent);
-  color: #fff;
+  color: var(--accent-contrast);
+}
+
+#code {
+  width: 100%;
+  letter-spacing: 0.02em;
+}
+
+#code:not(:placeholder-shown) {
+  text-transform: uppercase;
+}
+
+.hint {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin: -4px 0 16px;
+  cursor: pointer;
+}
+
+.check input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+button[type="submit"] {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font: inherit;
+  font-weight: 600;
   cursor: pointer;
 }
 
 button:disabled {
-  opacity: 0.5;
+  opacity: 0.55;
   cursor: default;
 }
 
-a {
-  color: var(--accent);
-}
-
-.status {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.status.error {
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  background: var(--error-surface);
+.form-error {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-left: 4px solid var(--error);
+  border-radius: 6px;
+  background: var(--error-soft);
   color: var(--error);
   white-space: pre-wrap;
 }
 
+.status {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.status:empty {
+  display: none;
+}
+
+/* Result ------------------------------------------------------------------- */
+
+.result-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.result-code {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.result-label {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.result-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius);
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
 #preview {
+  display: block;
   width: 100%;
   height: 75vh;
-  border: 1px solid var(--surface);
-  border-radius: 0.5rem;
-  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
 }
