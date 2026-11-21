@@ -6,3 +6,6 @@
 *.out
 *.fls
 *.fdb_latexmk
+
+# npm-Pakete (web/)
+node_modules/
