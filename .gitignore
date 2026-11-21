@@ -1,4 +1,4 @@
-# Generierte Blätter und LaTeX-Hilfsdateien
+# any generated files
 *.tex
 *.pdf
 *.aux
@@ -7,5 +7,8 @@
 *.fls
 *.fdb_latexmk
 
-# npm-Pakete (web/)
+# npm packages
 node_modules/
+
+# web app build
+web/dist/
