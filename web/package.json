@@ -1,0 +1,18 @@
+{
+  "name": "rechenblatt-web",
+  "private": true,
+  "type": "module",
+  "description": "Web frontend for Rechenblatt: Lua core (Wasmoon) and Typst (typst.ts) in the browser",
+  "scripts": {
+    "build": "node build.mjs",
+    "serve": "python3 -m http.server 8000 --bind 127.0.0.1 --directory dist"
+  },
+  "dependencies": {
+    "@myriaddreamin/typst-ts-web-compiler": "0.8.0-rc4",
+    "@myriaddreamin/typst.ts": "0.8.0-rc4",
+    "wasmoon": "1.16.0"
+  },
+  "devDependencies": {
+    "puppeteer-core": "25.16.0"
+  }
+}
