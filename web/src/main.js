@@ -1,12 +1,39 @@
-// Page wiring: engine (Lua + Typst) ↔ form ↔ result.
+// Page wiring: engine (Lua + Typst) ↔ form ↔ result ↔ history, plus the
+// "Technische Details" log.
 
+import { createDiagnostics } from "./diagnostics.js";
 import { createEngine, InputError } from "./engine.js";
 import { createForm } from "./form.js";
+import { createHistory, renderHistory } from "./history.js";
 
 const $ = (id) => document.getElementById(id);
 
+const diagnostics = createDiagnostics($("diagnostics-log"));
+diagnostics.log(`Browser: ${navigator.userAgent}`);
 const engine = createEngine();
 const form = createForm($("sheet-form"));
+const history = createHistory();
+let busy = false;
+
+function updateHistory() {
+  const entries = history.entries();
+  $("history").hidden = entries.length === 0;
+  renderHistory($("history-list"), entries, (entry, solutions) => {
+    // Not before the defaults are loaded (they would overwrite the entry) and
+    // not while a sheet is being generated.
+    if (busy || $("form-fields").disabled) {
+      return;
+    }
+    form.load({ code: entry.code, title: entry.title, solutions });
+    $("sheet-form").requestSubmit();
+  });
+}
+
+$("history-clear").addEventListener("click", () => {
+  history.clear();
+  updateHistory();
+});
+updateHistory();
 
 function setStatus(text) {
   $("status").textContent = text;
@@ -39,33 +66,55 @@ function showResult(sheet) {
 let typstReady = false;
 
 engine.luaReady
-  .then(async () => {
+  .then(async ({ ms }) => {
+    diagnostics.log(`Rechenkern (Lua) bereit nach ${ms} ms`);
     form.fill(await engine.defaults());
     $("form-fields").disabled = false;
     if (!typstReady) {
       setStatus("Lade Satzsystem … (beim ersten Besuch einige Sekunden)");
     }
   })
-  .catch((error) => setStatus(`Der Rechenkern konnte nicht geladen werden: ${error.message}`));
+  .catch((error) => {
+    setStatus(`Der Rechenkern konnte nicht geladen werden: ${error.message}`);
+    diagnostics.log(`Fehler beim Laden von Lua: ${error.stack ?? error}`);
+  });
 
 engine.typstReady
-  .then(() => {
+  .then(({ ms }) => {
     typstReady = true;
     setStatus("");
+    diagnostics.log(`Satzsystem (Typst) bereit nach ${ms} ms`);
+    diagnostics.logDownloads();
   })
-  .catch((error) => setStatus(`Das Satzsystem konnte nicht geladen werden: ${error.message}`));
+  .catch((error) => {
+    setStatus(`Das Satzsystem konnte nicht geladen werden: ${error.message}`);
+    diagnostics.log(`Fehler beim Laden von Typst: ${error.stack ?? error}`);
+  });
 
 $("sheet-form").addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (busy) {
+    return;
+  }
+  busy = true;
   const button = $("generate");
   $("form-error").hidden = true;
   button.disabled = true;
   button.textContent = typstReady ? "Erzeuge …" : "Warte auf Satzsystem …";
   try {
-    showResult(await engine.generate(form.request()));
+    const sheet = await engine.generate(form.request());
+    showResult(sheet);
+    const kb = Math.round(sheet.pdf.length / 1024);
+    diagnostics.log(
+      `Blatt ${sheet.code} (${sheet.count} Aufgaben): Lua ${sheet.timings.luaMs} ms, Typst ${sheet.timings.typstMs} ms, PDF ${kb} KB`,
+    );
+    history.add(sheet);
+    updateHistory();
   } catch (error) {
     showError(error instanceof InputError ? error.message : `Fehler: ${error.message}`);
+    diagnostics.log(error instanceof InputError ? `Eingabe: ${error.message}` : `Fehler: ${error.stack ?? error}`);
   } finally {
+    busy = false;
     button.disabled = false;
     button.textContent = "Blatt erzeugen";
   }

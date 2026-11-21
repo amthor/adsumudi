@@ -59,7 +59,10 @@ async function startTypst() {
   return compiler;
 }
 
+const since = (t0) => Math.round(performance.now() - t0);
+
 export function createEngine() {
+  const t0 = performance.now();
   const lua = startLua();
   const typst = startTypst();
   // Avoid "unhandled rejection" noise; callers see the error when they await.
@@ -67,10 +70,10 @@ export function createEngine() {
   typst.catch(() => {});
 
   return {
-    /** Resolves when the Lua core is ready (form defaults, input checks). */
-    luaReady: lua.then(() => undefined),
-    /** Resolves when Typst is ready (PDF output). */
-    typstReady: typst.then(() => undefined),
+    /** Resolves with {ms} (since createEngine) when the Lua core is ready. */
+    luaReady: lua.then(() => ({ ms: since(t0) })),
+    /** Resolves with {ms} (since createEngine) when Typst is ready (PDF output). */
+    typstReady: typst.then(() => ({ ms: since(t0) })),
 
     /** Form defaults from the Lua core: {operations, min, max, minutes, title}. */
     async defaults() {
@@ -81,15 +84,19 @@ export function createEngine() {
      * Generates a sheet.
      * @param request {settings: {operations?, min?, max?, count?, minutes?, code?},
      *                 presentation: {title?, solutions?}}
-     * @returns {code, count, description, title, pdf: Uint8Array}
+     * @returns {code, count, description, title, pdf: Uint8Array,
+     *           timings: {luaMs, typstMs}} (typstMs excludes waiting for Typst to load)
      * @throws InputError with a German message for invalid input
      */
     async generate(request) {
+      let start = performance.now();
       const response = JSON.parse((await lua).generate(JSON.stringify(request)));
+      const luaMs = since(start);
       if (!response.ok) {
         throw new InputError(response.error);
       }
       const compiler = await typst;
+      start = performance.now();
       // runWithWorld frees the compilation's memory afterwards.
       const { result, diagnostics } = await compiler.runWithWorld(
         { mainFilePath: TEMPLATE_PATH, inputs: { daten: response.source } },
@@ -99,7 +106,7 @@ export function createEngine() {
         throw new Error(`Typst ist fehlgeschlagen:\n${(diagnostics ?? []).join("\n")}`);
       }
       const { source, ok, ...sheet } = response;
-      return { ...sheet, pdf: result };
+      return { ...sheet, pdf: result, timings: { luaMs, typstMs: since(start) } };
     },
   };
 }

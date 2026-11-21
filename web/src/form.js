@@ -39,6 +39,11 @@ export function createForm(form) {
     radio.addEventListener("change", updateSizeMode);
   }
   field("code").addEventListener("input", updateCodeMode);
+  field("code-clear").addEventListener("click", () => {
+    field("code").value = "";
+    updateCodeMode();
+    field("code").focus();
+  });
 
   return {
     /** Sets the fields to the defaults from web.defaults(). */
@@ -49,8 +54,17 @@ export function createForm(form) {
       field("min").value = defaults.min;
       field("max").value = defaults.max;
       field("minutes").value = defaults.minutes;
+      field("title").value = defaults.title;
       modeRadios.find((radio) => radio.value === "minutes").checked = true;
       updateSizeMode();
+      updateCodeMode();
+    },
+
+    /** Loads a sheet from the history: its code and title, with or without solutions. */
+    load({ code, title, solutions }) {
+      field("code").value = code;
+      field("title").value = title;
+      field("solutions").checked = solutions;
       updateCodeMode();
     },
 
@@ -64,7 +78,7 @@ export function createForm(form) {
             max: numberValue("max"),
             [sizeMode()]: numberValue(sizeMode()),
           };
-      return { settings, presentation: { solutions: field("solutions").checked } };
+      return { settings, presentation: { title: field("title").value, solutions: field("solutions").checked } };
     },
   };
 }

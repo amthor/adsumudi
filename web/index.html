@@ -54,7 +54,15 @@
           <legend>Blattcode <span class="optional">zum Nachdrucken</span></legend>
           <input type="text" id="code" autocomplete="off" autocapitalize="characters" spellcheck="false"
                  placeholder="z. B. 1-AS-1-100-16-4711">
-          <p id="code-hint" class="hint" hidden>Der Blattcode legt Rechenarten, Zahlenraum und Aufgaben fest.</p>
+          <p id="code-hint" class="hint" hidden>
+            Der Blattcode legt Rechenarten, Zahlenraum und Aufgaben fest.
+            <button type="button" id="code-clear" class="link-button">Leeren</button>
+          </p>
+        </fieldset>
+
+        <fieldset class="group">
+          <legend><label for="title">Titel</label></legend>
+          <input type="text" id="title" autocomplete="off" maxlength="80">
         </fieldset>
 
         <label class="check"><input type="checkbox" id="solutions">Lösungsseite anhängen</label>
@@ -75,6 +83,20 @@
       </div>
       <iframe id="preview" title="Vorschau des Rechenblatts"></iframe>
     </section>
+
+    <section id="history" class="panel history" hidden>
+      <div class="history-title">
+        <h2>Zuletzt erzeugt</h2>
+        <button type="button" id="history-clear" class="link-button">Verlauf löschen</button>
+      </div>
+      <ol id="history-list" class="history-list"></ol>
+      <p class="hint">Der Verlauf wird nur in diesem Browser gespeichert.</p>
+    </section>
+
+    <details id="diagnostics" class="diagnostics">
+      <summary>Technische Details</summary>
+      <pre id="diagnostics-log"></pre>
+    </details>
   </main>
 </body>
 </html>

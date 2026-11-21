@@ -83,9 +83,12 @@ body {
 }
 
 @media (min-width: 900px) {
+  /* Form and history on the left, the preview spanning both on the right.
+     The last row is 1fr so that a tall preview does not stretch the form row. */
   .layout {
     grid-template-columns: 23rem minmax(0, 1fr);
-    grid-template-areas: "head head" "form result";
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: "head head" "form result" "history result";
     align-items: start;
     gap: 24px;
     padding: 24px;
@@ -97,12 +100,18 @@ body {
 
   #sheet-form {
     grid-area: form;
-    position: sticky;
-    top: 24px;
   }
 
   .result {
     grid-area: result;
+  }
+
+  .history {
+    grid-area: history;
+  }
+
+  .diagnostics {
+    grid-column: 1 / -1;
   }
 }
 
@@ -380,4 +389,116 @@ button:disabled {
   border: 1px solid var(--border);
   border-radius: 8px;
   background: #ffffff;
+}
+
+/* Small buttons ----------------------------------------------------------- */
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.small-button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.small-button:hover {
+  border-color: var(--accent);
+}
+
+#title {
+  width: 100%;
+}
+
+/* History ----------------------------------------------------------------- */
+
+.history-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.history-title h2 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.history-title .link-button {
+  font-size: 0.85rem;
+}
+
+.history-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history-entry {
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+.history-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.history-code {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.history-head time {
+  color: var(--muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.history-meta {
+  margin: 2px 0 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.history-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Technische Details -------------------------------------------------------- */
+
+.diagnostics summary {
+  color: var(--muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.diagnostics pre {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  font: 0.8rem/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
