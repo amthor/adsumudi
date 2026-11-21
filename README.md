@@ -1,7 +1,8 @@
 # Rechenblatt
 
 Erzeugt Mathe-Übungsblätter (3. Klasse) zum selbständigen Üben als PDF. Gesetzt wird mit
-[Typst](https://typst.app); LaTeX steht als Alternative zur Verfügung.
+[Typst](https://typst.app); LaTeX steht als Alternative zur Verfügung. Neben dem Kommandozeilenprogramm
+gibt es eine [Web-Oberfläche](#web-oberfläche), die vollständig im Browser läuft.
 
 ## Voraussetzungen
 
@@ -88,8 +89,37 @@ Das LaTeX-Template `templates/rechenblatt.tex.etlua` ist eine LaTeX-Datei mit et
 für HTML, nicht für LaTeX). Layout-Änderungen müssen in beiden Templates nachgezogen werden, wenn beide
 Satzsysteme gleich aussehen sollen.
 
+## Web-Oberfläche
+
+`web/` enthält eine statische Website für alle, die nicht mit der Kommandozeile arbeiten. Sie erzeugt
+dieselben Blätter wie das CLI, aber komplett im Browser: Der Lua-Code läuft in
+[Wasmoon](https://github.com/ceifa/wasmoon) (Lua 5.4 als WebAssembly), das Template wird mit
+[typst.ts](https://github.com/Myriad-Dreamin/typst.ts) gesetzt. Ein Server muss nur Dateien ausliefern.
+
+Voraussetzung ist [Node.js](https://nodejs.org) mit npm (nur zum Bauen und Testen).
+
+```sh
+cd web
+npm ci             # einmalig: Pakete exakt nach package-lock.json
+npm run build      # stellt web/dist/ zusammen (reines Kopieren, kein Bundler)
+npm run serve      # http://localhost:8000
+npm test           # e2e-Test in Chromium, vergleicht die PDFs mit dem CLI
+```
+
+Funktionen:
+- Rechenarten, Zahlenraum, Dauer oder Anzahl, Titel und Lösungsseite.
+- Blattcode zum Nachdrucken.
+- Verlauf der zuletzt erzeugten Blätter, nur im Browser gespeichert.
+- Aufklappbare „Technische Details“ mit Lade- und Erzeugungszeiten.
+
+`web/dist/` ist die komplette Website. Sie enthält Kopien von Lua-Code, Template und Schriften aus diesem
+Repository; geändert wird immer nur das Original, danach neu bauen. Der erste Aufruf lädt rund 30 MB
+(vor allem der Typst-Compiler; komprimiert ausgeliefert etwa 10 MB), danach kommt alles aus dem
+Browser-Cache.
+
 ## Tests
 
 ```sh
-busted
+busted                       # Lua: Kern, CLI, Backends, Web-Adapter
+cd web && npm run build && npm test   # Web-Oberfläche im Browser
 ```
