@@ -1,102 +1,192 @@
 <!doctype html>
 <html lang="de">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Adsumudi</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css">
-  <!-- wasmoon only ships a UMD bundle: it defines the global `wasmoon`. -->
-  <script src="vendor/wasmoon/index.js"></script>
-  <script type="module" src="src/main.js"></script>
-</head>
-<body>
-  <main class="layout">
-    <header class="masthead">
-      <h1>Adsumudi</h1>
-      <p class="tagline">Mathe-Übungsblätter zum Ausdrucken</p>
-    </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Adsumudi</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+    <!-- wasmoon only ships a UMD bundle: it defines the global `wasmoon`. -->
+    <script src="vendor/wasmoon/index.js"></script>
+    <script type="module" src="src/main.js"></script>
+  </head>
+  <body>
+    <main class="layout">
+      <header class="masthead">
+        <h1>Adsumudi</h1>
+        <p class="tagline">
+          <em>Addition — Subtraktion — Multiplikation — Division:</em><br />
+          Mathe-Übungsblätter zum Ausdrucken
+        </p>
+      </header>
 
-    <form id="sheet-form" class="panel" novalidate>
-      <!-- Disabled until the Lua core has delivered the defaults. -->
-      <fieldset id="form-fields" class="plain" disabled>
-        <fieldset id="operations-group" class="group">
-          <legend>Rechenarten</legend>
-          <div class="chips">
-            <label class="chip"><input type="checkbox" name="operation" value="add"><span class="chip-symbol">+</span>Plus</label>
-            <label class="chip"><input type="checkbox" name="operation" value="sub"><span class="chip-symbol">−</span>Minus</label>
-            <label class="chip"><input type="checkbox" name="operation" value="mul"><span class="chip-symbol chip-symbol-dot">·</span>Mal</label>
-            <label class="chip"><input type="checkbox" name="operation" value="div"><span class="chip-symbol">:</span>Geteilt</label>
+      <form id="sheet-form" class="panel" novalidate>
+        <!-- Disabled until the Lua core has delivered the defaults. -->
+        <fieldset id="form-fields" class="plain" disabled>
+          <fieldset id="operations-group" class="group">
+            <legend>Rechenarten</legend>
+            <div class="chips">
+              <label class="chip"
+                ><input type="checkbox" name="operation" value="add" /><span
+                  class="chip-symbol"
+                  >+</span
+                >Plus</label
+              >
+              <label class="chip"
+                ><input type="checkbox" name="operation" value="sub" /><span
+                  class="chip-symbol"
+                  >−</span
+                >Minus</label
+              >
+              <label class="chip"
+                ><input type="checkbox" name="operation" value="mul" /><span
+                  class="chip-symbol chip-symbol-dot"
+                  >·</span
+                >Mal</label
+              >
+              <label class="chip"
+                ><input type="checkbox" name="operation" value="div" /><span
+                  class="chip-symbol"
+                  >:</span
+                >Geteilt</label
+              >
+            </div>
+          </fieldset>
+
+          <fieldset id="range-group" class="group">
+            <legend>Zahlenraum</legend>
+            <div class="inline">
+              <label
+                >von
+                <input
+                  type="number"
+                  id="min"
+                  min="0"
+                  step="1"
+                  inputmode="numeric"
+              /></label>
+              <label
+                >bis
+                <input
+                  type="number"
+                  id="max"
+                  min="1"
+                  step="1"
+                  inputmode="numeric"
+              /></label>
+            </div>
+          </fieldset>
+
+          <fieldset id="size-group" class="group">
+            <legend>Umfang</legend>
+            <div class="segmented">
+              <label
+                ><input
+                  type="radio"
+                  name="size-mode"
+                  value="minutes"
+                  checked
+                />Dauer</label
+              >
+              <label
+                ><input
+                  type="radio"
+                  name="size-mode"
+                  value="count"
+                />Anzahl</label
+              >
+            </div>
+            <div class="inline">
+              <label id="minutes-field"
+                >etwa
+                <input
+                  type="number"
+                  id="minutes"
+                  min="0.5"
+                  step="0.5"
+                  inputmode="decimal"
+                />
+                Minuten</label
+              >
+              <label id="count-field" hidden
+                ><input
+                  type="number"
+                  id="count"
+                  min="1"
+                  step="1"
+                  inputmode="numeric"
+                  placeholder="20"
+                />
+                Aufgaben</label
+              >
+            </div>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend>
+              Blattcode <span class="optional">zum Nachdrucken</span>
+            </legend>
+            <input
+              type="text"
+              id="code"
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+              placeholder="z. B. 1-AS-1-100-16-4711"
+            />
+            <p id="code-hint" class="hint" hidden>
+              Der Blattcode legt Rechenarten, Zahlenraum und Aufgaben fest.
+              <button type="button" id="code-clear" class="link-button">
+                Leeren
+              </button>
+            </p>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend><label for="title">Titel</label></legend>
+            <input type="text" id="title" autocomplete="off" maxlength="80" />
+          </fieldset>
+
+          <label class="check"
+            ><input type="checkbox" id="solutions" />Lösungsseite
+            anhängen</label
+          >
+
+          <button type="submit" id="generate">Blatt erzeugen</button>
+          <p id="form-error" class="form-error" role="alert" hidden></p>
+        </fieldset>
+        <p id="status" class="status">Lade Rechenkern …</p>
+      </form>
+
+      <section id="result" class="panel result" hidden>
+        <div class="result-head">
+          <div>
+            <p class="result-code">
+              <span class="result-label">Blattcode</span>
+              <span id="result-code"></span>
+            </p>
+            <p id="result-meta" class="result-meta"></p>
           </div>
-        </fieldset>
-
-        <fieldset id="range-group" class="group">
-          <legend>Zahlenraum</legend>
-          <div class="inline">
-            <label>von <input type="number" id="min" min="0" step="1" inputmode="numeric"></label>
-            <label>bis <input type="number" id="max" min="1" step="1" inputmode="numeric"></label>
-          </div>
-        </fieldset>
-
-        <fieldset id="size-group" class="group">
-          <legend>Umfang</legend>
-          <div class="segmented">
-            <label><input type="radio" name="size-mode" value="minutes" checked>Dauer</label>
-            <label><input type="radio" name="size-mode" value="count">Anzahl</label>
-          </div>
-          <div class="inline">
-            <label id="minutes-field">etwa <input type="number" id="minutes" min="0.5" step="0.5" inputmode="decimal"> Minuten</label>
-            <label id="count-field" hidden><input type="number" id="count" min="1" step="1" inputmode="numeric" placeholder="20"> Aufgaben</label>
-          </div>
-        </fieldset>
-
-        <fieldset class="group">
-          <legend>Blattcode <span class="optional">zum Nachdrucken</span></legend>
-          <input type="text" id="code" autocomplete="off" autocapitalize="characters" spellcheck="false"
-                 placeholder="z. B. 1-AS-1-100-16-4711">
-          <p id="code-hint" class="hint" hidden>
-            Der Blattcode legt Rechenarten, Zahlenraum und Aufgaben fest.
-            <button type="button" id="code-clear" class="link-button">Leeren</button>
-          </p>
-        </fieldset>
-
-        <fieldset class="group">
-          <legend><label for="title">Titel</label></legend>
-          <input type="text" id="title" autocomplete="off" maxlength="80">
-        </fieldset>
-
-        <label class="check"><input type="checkbox" id="solutions">Lösungsseite anhängen</label>
-
-        <button type="submit" id="generate">Blatt erzeugen</button>
-        <p id="form-error" class="form-error" role="alert" hidden></p>
-      </fieldset>
-      <p id="status" class="status">Lade Rechenkern …</p>
-    </form>
-
-    <section id="result" class="panel result" hidden>
-      <div class="result-head">
-        <div>
-          <p class="result-code"><span class="result-label">Blattcode</span> <span id="result-code"></span></p>
-          <p id="result-meta" class="result-meta"></p>
+          <a id="download" class="button-secondary">PDF herunterladen</a>
         </div>
-        <a id="download" class="button-secondary">PDF herunterladen</a>
-      </div>
-      <iframe id="preview" title="Vorschau des Rechenblatts"></iframe>
-    </section>
+        <iframe id="preview" title="Vorschau des Rechenblatts"></iframe>
+      </section>
 
-    <section id="history" class="panel history" hidden>
-      <div class="history-title">
-        <h2>Zuletzt erzeugt</h2>
-        <button type="button" id="history-clear" class="link-button">Verlauf löschen</button>
-      </div>
-      <ol id="history-list" class="history-list"></ol>
-      <p class="hint">Der Verlauf wird nur in diesem Browser gespeichert.</p>
-    </section>
+      <section id="history" class="panel history" hidden>
+        <div class="history-title">
+          <h2>Zuletzt erzeugt</h2>
+          <button type="button" id="history-clear" class="link-button">
+            Verlauf löschen
+          </button>
+        </div>
+        <ol id="history-list" class="history-list"></ol>
+        <p class="hint">Der Verlauf wird nur in diesem Browser gespeichert.</p>
+      </section>
 
-    <details id="diagnostics" class="diagnostics">
-      <summary>Technische Details</summary>
-      <pre id="diagnostics-log"></pre>
-    </details>
-  </main>
-</body>
+      <details id="diagnostics" class="diagnostics">
+        <summary>Technische Details</summary>
+        <pre id="diagnostics-log"></pre>
+      </details>
+    </main>
+  </body>
 </html>
