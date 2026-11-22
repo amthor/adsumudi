@@ -182,6 +182,10 @@ Teile benutzen jeweils eigene Lizenzen:
 - [Wasmoon] (MIT) für die Web-Oberfläche und [typst.ts] (Apache-2.0) aus npm
   (Lizenztexte nach dem Build in `web/dist/vendor/`)
 
+## KI-Transparenzhinweis
+
+Adsumudi ist mit Unterstützung durch KI-generierten Code und Tests entstanden. Anforderungen, Entwurf, Prüfung und Anpassungen sowie Commits liegen sämtlich beim Autor.
+
 [Typst]: https://typst.app
 [LaTeX]: https://www.latex-project.org/
 [etlua]: https://github.com/leafo/etlua
