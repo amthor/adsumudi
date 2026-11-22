@@ -1,5 +1,8 @@
 # Adsumudi
 
+[![Pages](https://github.com/amthor/adsumudi/actions/workflows/pages.yml/badge.svg)](https://github.com/amthor/adsumudi/actions/workflows/pages.yml)
+[![License](https://img.shields.io/github/license/amthor/adsumudi)](LICENSE)
+
 **Ad**dition — **Su**btraktion — **Mu**ltiplikation — **Di**vision
 
 Adsumudi erzeugt Mathe-Übungsblätter (Grundschule) zum selbständigen Üben als
