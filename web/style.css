@@ -1,5 +1,9 @@
-/* The page borrows from a school exercise book: squared paper, ink blue,
-   correction red, and Fira Sans like the worksheet itself. */
+/* Design idea: school exercise book with squared paper. Palette: 
+   cream background, apricot accent, dark ink (playful/contrast). Red = error messages!
+
+   Accent comes in two shades: --accent for filled areas (with
+   --accent-contrast text on top) and the darker --accent-text for text,
+   borders and focus rings, so both meet WCAG AA contrast (4.5:1). */
 
 @font-face {
   font-family: "Fira Sans";
@@ -23,35 +27,36 @@
 }
 
 :root {
-  --ink: #1b2a4a;
-  --muted: #5b6478;
-  --paper: #ffffff;
-  --grid: #e3eaf4;
-  --panel: #ffffff;
-  --border: #cfd8e6;
-  --accent: #1f4fbf;
-  --accent-contrast: #ffffff;
-  --accent-soft: #e8eefb;
-  --error: #c62828;
-  --error-soft: #fdeceb;
+  --ink: #2a2f3a;
+  --muted: #6e6458;
+  --paper: #fff9f2;
+  --grid: #f3e6d6;
+  --panel: #fffdf9;
+  --border: #e3d2be;
+  --accent: #f0904a;
+  --accent-contrast: #2a2f3a;
+  --accent-text: #a9480f;
+  --accent-soft: #fde7d3;
+  --error: #b42344;
+  --error-soft: #fcebee;
   --radius: 10px;
-  color-scheme: light dark;
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ink: #e8ecf4;
-    --muted: #a3acbf;
-    --paper: #14161c;
-    --grid: #1e222c;
-    --panel: #1b1f28;
-    --border: #353c4c;
-    --accent: #85a8ff;
-    --accent-contrast: #0d1424;
-    --accent-soft: #232f4b;
-    --error: #ff8a80;
-    --error-soft: #3a1f1d;
-  }
+:root[data-theme="dark"] {
+  --ink: #f1e9df;
+  --muted: #b8ac9e;
+  --paper: #1c1915;
+  --grid: #26221d;
+  --panel: #25211c;
+  --border: #433b32;
+  --accent: #f2a36b;
+  --accent-contrast: #1c1915;
+  --accent-text: #f2a36b;
+  --accent-soft: #3a2a1d;
+  --error: #ff8fa3;
+  --error-soft: #3a1f25;
+  color-scheme: dark;
 }
 
 * {
@@ -62,16 +67,29 @@
   display: none !important;
 }
 
+/* For screen readers */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 body {
   margin: 0;
   color: var(--ink);
   background-color: var(--paper);
-  /* squared paper, 5 mm boxes */
+  /* "squared paper" 5 mm */
   background-image:
     linear-gradient(var(--grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid) 1px, transparent 1px);
   background-size: 20px 20px;
-  font: 17px/1.45 "Fira Sans", system-ui, sans-serif;
+  font:
+    17px/1.45 "Fira Sans",
+    system-ui,
+    sans-serif;
 }
 
 .layout {
@@ -209,18 +227,18 @@ fieldset:disabled .segmented {
 }
 
 .chip:has(input:checked) {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .chip:has(input:checked) .chip-symbol {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .chip:has(input:focus-visible),
 .segmented label:has(input:focus-visible) {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--accent-text);
   outline-offset: 2px;
 }
 
@@ -248,7 +266,7 @@ input[type="number"] {
 }
 
 input:focus-visible {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   outline: 2px solid var(--accent-soft);
 }
 
@@ -375,9 +393,9 @@ button:disabled {
   align-items: center;
   min-height: 44px;
   padding: 0 16px;
-  border: 1.5px solid var(--accent);
+  border: 1.5px solid var(--accent-text);
   border-radius: var(--radius);
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
   text-decoration: none;
 }
@@ -397,7 +415,7 @@ button:disabled {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--accent);
+  color: var(--accent-text);
   font: inherit;
   text-decoration: underline;
   cursor: pointer;
@@ -409,7 +427,7 @@ button:disabled {
   border: 1.5px solid var(--border);
   border-radius: 8px;
   background: var(--paper);
-  color: var(--accent);
+  color: var(--accent-text);
   font: inherit;
   font-size: 0.9rem;
   font-weight: 600;
@@ -417,7 +435,7 @@ button:disabled {
 }
 
 .small-button:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 #title {
@@ -498,7 +516,12 @@ button:disabled {
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--panel);
-  font: 0.8rem/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font:
+    0.8rem/1.5 ui-monospace,
+    "SF Mono",
+    Menlo,
+    Consolas,
+    monospace;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
