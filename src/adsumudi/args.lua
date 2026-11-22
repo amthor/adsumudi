@@ -4,17 +4,6 @@
 -- Only knows about flags. Domain defaults, validation and the resolution of
 -- minutes and sheet codes live in the core API (sheet.lua).
 
---- Settings type (input for sheet.generate).
---- Holds only what was provided by the user.
---- @class Settings
---- @field operations Operation[]?
---- @field min        integer?
---- @field max        integer?
---- @field count      integer?
---- @field minutes    number?
---- @field seed       integer?
---- @field code       string?
-
 local M = {}
 
 --- Output/presentation defaults of the CLI.
@@ -68,7 +57,7 @@ Beispiele:
 ]]
 
 --- Aliases for option values.
---- @enum Operation
+--- @type { [string]: Operation }
 local ALIASES = {
 	add = "add",
 	["+"] = "add",
@@ -87,7 +76,7 @@ local ALIASES = {
 }
 
 --- Translates alternative strings to operation identifiers.
---  **Might panic:** unknown operation; no operations given.
+--  **Throws error:** unknown operation; no operations given.
 --- @param text string
 --- @return Operation[]
 local function parse_operations(text)
@@ -109,7 +98,7 @@ local function parse_operations(text)
 end
 
 --- Translates a named argument to a number.
---  **Might panic:** `tonumber` fails; `tointeger` fails while `is_integer` is set.
+--  **Throws error:** `tonumber` fails; `tointeger` fails while `is_integer` is set.
 --- @param name string
 --- @param value string
 --- @param is_integer boolean?
@@ -129,7 +118,7 @@ local function number(name, value, is_integer)
 end
 
 --- Parses the arguments.
---  Errors are raised via error(msg, 0).
+--  **Throws error:** unknown or malformed option, or a conflict with --blattcode.
 --- @param args string[]
 --- @return { settings: Settings, output: string?, backend: string?, source_only: boolean, title: string, solutions: boolean, debug: boolean, help: boolean? }
 function M.parse(args)
@@ -143,7 +132,7 @@ function M.parse(args)
 	local explicit = {}
 	local i = 1
 	---  Gets the value of a named option.
-	--   **Might panic:** missing value for a mandatory option.
+	--   **Throws error:** missing value for a mandatory option.
 	--- @param name string
 	--- @return string
 	local function value(name)

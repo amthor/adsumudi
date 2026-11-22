@@ -1,7 +1,7 @@
 -- sheet.lua
 -- Core API: turns sheet settings into a fully determined sheet.
 --
--- This is the single entry point both frontends (CLI and web app) use. Does no
+-- This is the single entry point for both frontends (CLI and web app). Does no
 -- I/O and never exits the program. Errors are returned as `nil, string`, with
 -- frontend-neutral messages (i.e., not relating to CLI flags). Logic here is
 -- oblivious to presentation details (title, solution page, output format).
@@ -10,21 +10,39 @@ local tasks = require("adsumudi.tasks")
 local rng = require("adsumudi.rng")
 local sheet_code = require("adsumudi.sheet_code")
 
---- Sheet data generated.
---- @class SheetData
---- @field tasks      Task[]
+--- Settings type (input for sheet.generate).
+--  Holds only what was provided by the user, unchecked (operation names are
+--  plain strings until validate() accepts them).
+--- @class Settings
+--- @field operations string[]?
+--- @field min        integer?
+--- @field max        integer?
+--- @field count      integer?
+--- @field minutes    number?
+--- @field seed       integer?
+--- @field code       string?
+
+--- Resolved and validated settings.
+--- @class ResolvedSettings : TaskListOptions
+--- @field minutes number?  only if `Settings.count` based on it
+--- @field seed    integer
+
+--- Sheet config defaults (all fields have values).
+--- @class SheetDefaults
 --- @field operations Operation[]
 --- @field min        integer
 --- @field max        integer
---- @field count      integer
---- @field minutes    number?
---- @field seed       integer
---- @field code       string
+--- @field minutes    number
+
+--- Sheet data generated.
+--- @class SheetData : ResolvedSettings
+--- @field tasks Task[]
+--- @field code  string
 
 local M = {}
 
---- Domain defaults: addition and subtraction up to 100, enough for 5 minutes.
---- @type table
+--- Sheet defaults: add and sub in range 1…100 for 5 minutes working time.
+--- @type SheetDefaults
 M.DEFAULTS = {
 	min = 1,
 	max = 100,
@@ -80,10 +98,10 @@ local function validate(s)
 end
 
 --- Resolves settings: apply defaults for options not given, validate resulting
---- settings.
+--  settings.
 --  **Throws error:** validation fails.
 --- @param settings Settings?
---- @return Settings
+--- @return ResolvedSettings
 local function resolve(settings)
 	settings = settings or {}
 	--- @type Settings
@@ -113,15 +131,16 @@ local function resolve(settings)
 	else
 		s.count = tasks.count_for_minutes(s.minutes, s.operations)
 	end
-	-- At most five digits keep the sheet code short; collisions are harmless.
+	-- Keep code short: <= five digits (collisions acceptable)
 	s.seed = s.seed or os.time() % 100000
-	return s
+	-- Every field is set and validated now → cast to "resolved" type
+	return s --[[@as ResolvedSettings]]
 end
 
 --- Applies defaults, a sheet code, validation, count and seed.
 --  `count` takes precedence over `minutes`; `code` overrides everything.
 --- @param settings Settings
---- @return Settings|nil, string? if `nil`: append a German error message
+--- @return ResolvedSettings|nil, string? if `nil`: append a German error message
 function M.resolve(settings)
 	local ok, result = pcall(resolve, settings)
 	if not ok then
@@ -142,9 +161,10 @@ function M.generate(settings)
 	if not ok then
 		return nil, tostring(list)
 	end
-	s.tasks = list
-	s.code = sheet_code.encode(s)
-	return s
+	local data = s --[[@as SheetData]]
+	data.tasks = list
+	data.code = sheet_code.encode(s)
+	return data
 end
 
 return M
