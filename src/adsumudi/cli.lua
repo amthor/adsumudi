@@ -42,6 +42,7 @@ function M.main(argv, out, errout)
 		return 0
 	end
 
+	--- @type Backend
 	local backend = require(BACKENDS[opts.backend])
 	local output = opts.output or (opts.source_only and "rechenblatt." .. backend.SOURCE_EXT or "rechenblatt.pdf")
 	if not opts.source_only and not output:match("%.pdf$") then
