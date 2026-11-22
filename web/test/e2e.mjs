@@ -275,6 +275,49 @@ try {
   await waitReady(page);
   check("Verlauf löschen", (await historyEntries(page)).length === 0 && (await page.$eval("#history", (e) => e.hidden)));
 
+  // Color scheme: "auto" follows the device, an explicit choice wins and survives a reload.
+  const theme = () =>
+    page.evaluate(() => ({
+      theme: document.documentElement.dataset.theme,
+      checked: document.querySelector('input[name="theme"]:checked')?.value,
+      paper: getComputedStyle(document.body).backgroundColor,
+    }));
+  const chooseTheme = (value) => page.$eval(`input[name="theme"][value="${value}"]`, (input) => input.click());
+  // The media change event arrives with the next rendering update, not at once.
+  const emulateScheme = async (value) => {
+    await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value }]);
+    await page
+      .waitForFunction((v) => document.documentElement.dataset.theme === v, { timeout: 3000 }, value)
+      .catch(() => {});
+  };
+  await emulateScheme("dark");
+  const autoDark = await theme();
+  await emulateScheme("light");
+  const autoLight = await theme();
+  check(
+    "Farbschema „Automatisch“ folgt dem Gerät",
+    autoDark.theme === "dark" && autoDark.checked === "auto" && autoDark.paper === "rgb(28, 25, 21)" &&
+      autoLight.theme === "light" && autoLight.paper === "rgb(255, 249, 242)",
+    JSON.stringify({ autoDark, autoLight }),
+  );
+  await chooseTheme("dark");
+  await page.reload();
+  await waitReady(page);
+  const chosenDark = await theme();
+  check(
+    "Farbschema „Dunkel“ gilt trotz hellem Gerät, auch nach Neuladen",
+    chosenDark.theme === "dark" && chosenDark.checked === "dark",
+    JSON.stringify(chosenDark),
+  );
+  await chooseTheme("auto");
+  const backToAuto = await theme();
+  const stored = await page.evaluate(() => localStorage.getItem("adsumudi.theme.v1"));
+  check(
+    "Farbschema zurück auf „Automatisch“",
+    backToAuto.theme === "light" && stored === null,
+    JSON.stringify({ backToAuto, stored }),
+  );
+
   check("keine Seitenfehler und keine fehlgeschlagenen Anfragen", problems.length === 0, problems.join("\n    "));
 } finally {
   await browser.close();
