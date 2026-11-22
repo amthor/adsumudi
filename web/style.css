@@ -1,6 +1,8 @@
 /* Design idea: school exercise book with squared paper. Palette: 
    cream background, apricot accent, dark ink (playful/contrast). Red = error messages!
 
+   Colors are tokens on :root. src/theme.js sets <html data-theme="light|dark">
+   (from the switch or the device setting), only these two blocks differ.
    Accent comes in two shades: --accent for filled areas (with
    --accent-contrast text on top) and the darker --accent-text for text,
    borders and focus rings, so both meet WCAG AA contrast (4.5:1). */
@@ -133,6 +135,29 @@ body {
   }
 }
 
+/* Heading and switch share the first row; the tagline gets the full width
+   below, which matters on narrow phones. */
+.masthead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 16px;
+}
+
+.masthead > div {
+  display: contents;
+}
+
+.masthead .tagline {
+  grid-column: 1 / -1;
+}
+
+.masthead .theme-switch {
+  grid-row: 1;
+  grid-column: 2;
+  justify-self: end;
+}
+
 .masthead h1 {
   margin: 0;
   font-size: 2rem;
@@ -150,6 +175,40 @@ body {
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--panel);
+}
+
+/* Color scheme switch: auto / light / dark ----------------------------- */
+
+.theme-switch {
+  display: inline-flex;
+  flex: none;
+  min-width: 0;
+  margin: 0;
+  padding: 3px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+}
+
+.theme-switch label {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 38px;
+  border-radius: 999px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.theme-switch svg {
+  width: 20px;
+  height: 20px;
+}
+
+.theme-switch label:has(input:checked) {
+  background: var(--accent);
+  color: var(--accent-contrast);
 }
 
 /* Form ------------------------------------------------------------------- */
@@ -205,7 +264,8 @@ fieldset:disabled .segmented {
 
 /* The real checkbox covers the chip: clickable and keyboard-focusable, but invisible. */
 .chip input,
-.segmented input {
+.segmented input,
+.theme-switch input {
   position: absolute;
   inset: 0;
   margin: 0;
@@ -237,7 +297,8 @@ fieldset:disabled .segmented {
 }
 
 .chip:has(input:focus-visible),
-.segmented label:has(input:focus-visible) {
+.segmented label:has(input:focus-visible),
+.theme-switch label:has(input:focus-visible) {
   outline: 2px solid var(--accent-text);
   outline-offset: 2px;
 }
