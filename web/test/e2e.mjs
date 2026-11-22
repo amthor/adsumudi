@@ -1,8 +1,9 @@
 // End-to-end test of the built site (web/dist/) in headless Chromium.
 //
 //   npm run build && npm test        (from web/)
+//   E2E_URL=https://amthor.github.io/adsumudi/ npm test   (the published site)
 //
-// Serves dist/ itself, drives the page like a user and compares the PDFs with
+// Serves dist/ itself (or tests E2E_URL), drives the page like a user and compares the PDFs with
 // the CLI's (`pdftotext -bbox`: every word with its coordinates; bytes may
 // differ by creation date and document id). Needs lua, pdftotext and
 // Chromium; set CHROMIUM=/path/to/chrome if it is not found automatically.
@@ -147,7 +148,9 @@ const historyEntries = (page) =>
 
 // --- test --------------------------------------------------------------------------
 
-if (!existsSync(join(dist, "index.html"))) {
+// E2E_URL: test an already published site instead of serving dist/.
+const remoteUrl = process.env.E2E_URL;
+if (!remoteUrl && !existsSync(join(dist, "index.html"))) {
   console.error("web/dist/ fehlt – zuerst: npm run build");
   process.exit(1);
 }
@@ -158,8 +161,9 @@ if (!executablePath) {
 }
 
 const tmp = mkdtempSync(join(tmpdir(), "adsumudi-e2e-"));
-const server = await startServer();
-const url = `http://127.0.0.1:${server.address().port}/`;
+const server = remoteUrl ? null : await startServer();
+const url = remoteUrl ?? `http://127.0.0.1:${server.address().port}/`;
+console.log(`Teste ${url}\n`);
 const browser = await puppeteer.launch({ executablePath, headless: true });
 const problems = [];
 
@@ -274,7 +278,7 @@ try {
   check("keine Seitenfehler und keine fehlgeschlagenen Anfragen", problems.length === 0, problems.join("\n    "));
 } finally {
   await browser.close();
-  server.close();
+  server?.close();
   rmSync(tmp, { recursive: true, force: true });
 }
 
