@@ -1,6 +1,7 @@
-# Rechenblatt
+# Adsumudi
 
-Erzeugt Mathe-Übungsblätter (3. Klasse) zum selbständigen Üben als PDF. Gesetzt wird mit
+**Ad**dition, **Su**btraktion, **Mu**ltiplikation, **Di**vision: Adsumudi erzeugt
+Mathe-Übungsblätter (3. Klasse) zum selbständigen Üben als PDF. Gesetzt wird mit
 [Typst](https://typst.app); LaTeX steht als Alternative zur Verfügung. Neben dem Kommandozeilenprogramm
 gibt es eine [Web-Oberfläche](#web-oberfläche), die vollständig im Browser läuft.
 
@@ -20,11 +21,11 @@ gibt es eine [Web-Oberfläche](#web-oberfläche), die vollständig im Browser l�
 ## Benutzung
 
 ```sh
-lua rechenblatt.lua                    # Voreinstellung: Plus/Minus, 1–100, für 5 Minuten → rechenblatt.pdf
-lua rechenblatt.lua -r mul,div -n 30 -l -o mal.pdf   # 30 Mal-/Geteilt-Aufgaben mit Lösungsblatt
-lua rechenblatt.lua -r +,-,*,: -t 10 --max 50
-lua rechenblatt.lua --satz latex       # dasselbe Blatt mit LaTeX gesetzt
-lua rechenblatt.lua --hilfe            # alle Optionen
+lua adsumudi.lua                    # Voreinstellung: Plus/Minus, 1–100, für 5 Minuten → rechenblatt.pdf
+lua adsumudi.lua -r mul,div -n 30 -l -o mal.pdf   # 30 Mal-/Geteilt-Aufgaben mit Lösungsblatt
+lua adsumudi.lua -r +,-,*,: -t 10 --max 50
+lua adsumudi.lua --satz latex       # dasselbe Blatt mit LaTeX gesetzt
+lua adsumudi.lua --hilfe            # alle Optionen
 ```
 
 | Option | Bedeutung | Standard |
@@ -49,7 +50,7 @@ lua rechenblatt.lua --hilfe            # alle Optionen
 - Rechenarten werden gleichmäßig verteilt und gemischt, doppelte Aufgaben werden vermieden.
 
 Die Anzahl für eine Dauer ergibt sich aus geschätzten Sekunden pro Aufgabe
-(`SECONDS_PER_TASK` in `src/rechenblatt/tasks.lua`: Plus 17 s, Minus 20 s,
+(`SECONDS_PER_TASK` in `src/adsumudi/tasks.lua`: Plus 17 s, Minus 20 s,
 Mal 15 s, Geteilt 20 s). Passe die Werte an, wenn das Tempo nicht passt.
 
 ## Blatt nachdrucken
@@ -59,7 +60,7 @@ nach dem Erzeugen auf der Konsole ausgegeben. Mit ihm lässt sich das Blatt spä
 etwa um nachträglich die Lösungen zu drucken:
 
 ```sh
-lua rechenblatt.lua --blattcode 1-AS-1-100-22-48213 -l
+lua adsumudi.lua --blattcode 1-AS-1-100-22-48213 -l
 ```
 
 Aufbau: `Version-Rechenarten-Min-Max-Anzahl-Seed`. Die Rechenarten sind A (Plus), S (Minus),
@@ -73,18 +74,18 @@ zu liefern.
 
 ## Layout anpassen
 
-Das Aussehen des Blatts steht vollständig in `templates/rechenblatt.typ`. Lua liefert nur die Daten
+Das Aussehen des Blatts steht vollständig in `templates/adsumudi.typ`. Lua liefert nur die Daten
 (als JSON). Ohne Daten von Lua zeigt das Template die Beispieldaten aus `templates/beispiel.json`,
 sodass sich das Layout live bearbeiten lässt:
 
 ```sh
-typst watch --font-path fonts templates/rechenblatt.typ
+typst watch --font-path fonts templates/adsumudi.typ
 ```
 
 Die Breite der Zahlenboxen ist `ziffernbreite` (0.7em) mal der maximalen Stellenzahl des
 Zahlenbereichs; die übrigen Breiten einer Aufgabe stehen als benannte Werte im Template.
 
-Das LaTeX-Template `templates/rechenblatt.tex.etlua` ist eine LaTeX-Datei mit etlua-Platzhaltern:
+Das LaTeX-Template `templates/adsumudi.tex.etlua` ist eine LaTeX-Datei mit etlua-Platzhaltern:
 `<% lua-code %>` für Schleifen/Bedingungen, `<%- wert %>` für Werte (nicht `<%= %>` – das maskiert
 für HTML, nicht für LaTeX). Layout-Änderungen müssen in beiden Templates nachgezogen werden, wenn beide
 Satzsysteme gleich aussehen sollen.

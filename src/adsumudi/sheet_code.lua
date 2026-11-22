@@ -8,7 +8,7 @@
 --               tasks.SECONDS_PER_TASK does not invalidate old codes
 -- Title and the "Zeit: etwa N Minuten" hint are presentation, not part of the code.
 
-local tasks = require("rechenblatt.tasks")
+local tasks = require("adsumudi.tasks")
 
 local M = {}
 

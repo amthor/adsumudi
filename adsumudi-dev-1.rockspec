@@ -1,5 +1,5 @@
 rockspec_format = "3.0"
-package = "rechenblatt"
+package = "adsumudi"
 version = "dev-1"
 source = {
 	url = ".",

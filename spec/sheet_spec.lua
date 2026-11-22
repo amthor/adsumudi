@@ -1,4 +1,4 @@
-local sheet = require("rechenblatt.sheet")
+local sheet = require("adsumudi.sheet")
 
 describe("sheet.resolve", function()
 	it("Voreinstellung: Plus/Minus, 1-100, 5 Minuten", function()

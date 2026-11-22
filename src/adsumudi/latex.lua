@@ -1,13 +1,13 @@
 -- LaTeX backend (alternative to Typst, --satz latex): fills
--- templates/rechenblatt.tex.etlua with the template view (view.lua) and adds
+-- templates/adsumudi.tex.etlua with the template view (view.lua) and adds
 -- what is LaTeX-specific: escaping and TeX operator symbols. The layout lives
 -- entirely in the template. Same backend interface as typst.lua.
 --
 -- etlua is loaded only when this backend is actually used, so the default
 -- Typst backend works without it.
 
-local view = require("rechenblatt.view")
-local shell = require("rechenblatt.shell")
+local view = require("adsumudi.view")
+local shell = require("adsumudi.shell")
 
 local M = {}
 
@@ -20,9 +20,9 @@ local OPERATOR = {
 	div = ":",
 }
 
--- The template is located relative to this module: src/rechenblatt/ -> ../../templates/
+-- The template is located relative to this module: src/adsumudi/ -> ../../templates/
 local MODULE_DIR = debug.getinfo(1, "S").source:match("^@(.*)[/\\]") or "."
-M.TEMPLATE_PATH = MODULE_DIR .. "/../../templates/rechenblatt.tex.etlua"
+M.TEMPLATE_PATH = MODULE_DIR .. "/../../templates/adsumudi.tex.etlua"
 
 local TEX_SPECIAL_CHARS = {
 	["\\"] = "\\textbackslash{}",

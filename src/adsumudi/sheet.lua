@@ -5,9 +5,9 @@
 -- `nil, message`, with messages that do not mention any CLI flags.
 -- Presentation (title, solution page, output format) is not its business.
 
-local tasks = require("rechenblatt.tasks")
-local rng = require("rechenblatt.rng")
-local sheet_code = require("rechenblatt.sheet_code")
+local tasks = require("adsumudi.tasks")
+local rng = require("adsumudi.rng")
+local sheet_code = require("adsumudi.sheet_code")
 
 local M = {}
 

@@ -1,12 +1,12 @@
-// Rechenblatt – Typst-Template
+// Adsumudi – Typst-Template
 //
-// Die Daten kommen als JSON von Lua (src/rechenblatt/typst.lua) über
-//   typst compile --input daten='<json>' rechenblatt.typ blatt.pdf
+// Die Daten kommen als JSON von Lua (src/adsumudi/typst.lua) über
+//   typst compile --input daten='<json>' adsumudi.typ blatt.pdf
 // Ohne --input wird beispiel.json verwendet, damit sich das Layout direkt
 // bearbeiten und live ansehen lässt:
-//   typst watch --font-path fonts templates/rechenblatt.typ
+//   typst watch --font-path fonts templates/adsumudi.typ
 // beispiel.json neu erzeugen:
-//   lua rechenblatt.lua -t 5 -s 4711 -l --quelle -o templates/beispiel.json
+//   lua adsumudi.lua -t 5 -s 4711 -l --quelle -o templates/beispiel.json
 //
 // Felder: titel, beschreibung, minuten (Text oder none), blattcode (Text oder
 // none), stellen, debug, seiten ((loesung: bool), …),

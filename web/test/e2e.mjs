@@ -70,7 +70,7 @@ const bbox = (pdf) =>
 
 function cliPdf(dir, code, { solutions, title }) {
   const path = join(dir, `cli-${code}.pdf`);
-  const args = ["rechenblatt.lua", "-c", code, "-o", path];
+  const args = ["adsumudi.lua", "-c", code, "-o", path];
   if (solutions) args.push("-l");
   if (title) args.push("--titel", title);
   execFileSync("lua", args, { cwd: root });
@@ -157,7 +157,7 @@ if (!executablePath) {
   process.exit(1);
 }
 
-const tmp = mkdtempSync(join(tmpdir(), "rechenblatt-e2e-"));
+const tmp = mkdtempSync(join(tmpdir(), "adsumudi-e2e-"));
 const server = await startServer();
 const url = `http://127.0.0.1:${server.address().port}/`;
 const browser = await puppeteer.launch({ executablePath, headless: true });

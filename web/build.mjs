@@ -36,8 +36,8 @@ cpSync(join(web, "src"), join(dist, "src"), { recursive: true });
 
 // Lua core. All modules are copied; only the ones web.lua requires get loaded.
 const luaFiles = [];
-for (const name of readdirSync(join(root, "src", "rechenblatt")).filter((n) => n.endsWith(".lua"))) {
-  luaFiles.push(`rechenblatt/${name}`);
+for (const name of readdirSync(join(root, "src", "adsumudi")).filter((n) => n.endsWith(".lua"))) {
+  luaFiles.push(`adsumudi/${name}`);
 }
 luaFiles.push("dkjson/dkjson.lua");
 for (const file of luaFiles) {
@@ -47,7 +47,7 @@ for (const file of luaFiles) {
 writeFileSync(join(dist, "lua-files.json"), JSON.stringify(luaFiles, null, 2) + "\n");
 
 // Typst template and fonts (with their license).
-copy(join(root, "templates", "rechenblatt.typ"), join(dist, "typst", "rechenblatt.typ"));
+copy(join(root, "templates", "adsumudi.typ"), join(dist, "typst", "adsumudi.typ"));
 copyMatching(join(root, "fonts"), join(dist, "fonts"), /\.otf$|^OFL\.txt$/);
 
 // Third-party runtime files.

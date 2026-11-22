@@ -1,5 +1,5 @@
 local json = require("dkjson.dkjson")
-local typst = require("rechenblatt.typst")
+local typst = require("adsumudi.typst")
 
 describe("typst.render", function()
 	local sheet = {

@@ -1,4 +1,4 @@
-local shell = require("rechenblatt.shell")
+local shell = require("adsumudi.shell")
 
 describe("shell.quote", function()
 	it("macht beliebigen Text zu genau einem Shell-Wort", function()

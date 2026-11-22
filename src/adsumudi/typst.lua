@@ -1,5 +1,5 @@
 -- Typst backend (default): serializes the template view (view.lua) to JSON,
--- which templates/rechenblatt.typ reads via sys.inputs. Unlike LaTeX, no
+-- which templates/adsumudi.typ reads via sys.inputs. Unlike LaTeX, no
 -- escaping is needed: Typst inserts JSON strings literally, never as markup.
 --
 -- Backend interface (shared with latex.lua):
@@ -8,16 +8,16 @@
 --   build(source, pdf_path, options)   -> pdf_path, or nil, message
 
 local json = require("dkjson.dkjson")
-local view = require("rechenblatt.view")
-local shell = require("rechenblatt.shell")
+local view = require("adsumudi.view")
+local shell = require("adsumudi.shell")
 
 local M = {}
 
 M.SOURCE_EXT = "json"
 
--- Project root relative to this module: src/rechenblatt/ -> ../../
+-- Project root relative to this module: src/adsumudi/ -> ../../
 local ROOT = (debug.getinfo(1, "S").source:match("^@(.*)[/\\]") or ".") .. "/../.."
-M.TEMPLATE_PATH = ROOT .. "/templates/rechenblatt.typ"
+M.TEMPLATE_PATH = ROOT .. "/templates/adsumudi.typ"
 M.FONT_DIR = ROOT .. "/fonts"
 
 -- Stable, readable key order in the JSON output.

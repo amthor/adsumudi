@@ -4,7 +4,7 @@
 // a few hundred milliseconds; Typst needs its 29 MB WebAssembly module, which
 // can take seconds on a first visit. generate() waits for whatever is missing.
 //
-// The only interface to Lua is src/rechenblatt/web.lua: one JSON string in,
+// The only interface to Lua is src/adsumudi/web.lua: one JSON string in,
 // one JSON string out (see the comments there).
 
 import { createTypstCompiler } from "../vendor/typst.ts/compiler.mjs";
@@ -14,7 +14,7 @@ import { disableDefaultFontAssets, loadFonts } from "../vendor/typst.ts/options.
 const BASE = new URL("../", import.meta.url);
 const FONTS = ["FiraSans-Regular.otf", "FiraSans-SemiBold.otf", "FiraSans-Bold.otf"];
 // Path of the template in typst.ts's virtual file system.
-const TEMPLATE_PATH = "/rechenblatt.typ";
+const TEMPLATE_PATH = "/adsumudi.typ";
 
 /** An error the user caused (invalid input); its message is meant to be shown. */
 export class InputError extends Error {}
@@ -39,7 +39,7 @@ async function startLua() {
   const lua = await factory.createEngine();
   await lua.doString(`
     package.path = "/lua/?.lua"
-    local web = require("rechenblatt.web")
+    local web = require("adsumudi.web")
     web_defaults, web_generate = web.defaults, web.generate
   `);
   return { defaults: lua.global.get("web_defaults"), generate: lua.global.get("web_generate") };
@@ -55,7 +55,7 @@ async function startTypst() {
     // Only the bundled fonts, like `typst compile --ignore-system-fonts --font-path fonts`.
     beforeBuild: [disableDefaultFontAssets(), loadFonts(FONTS.map((f) => new URL(`fonts/${f}`, BASE).href))],
   });
-  compiler.addSource(TEMPLATE_PATH, await fetchOk("typst/rechenblatt.typ"));
+  compiler.addSource(TEMPLATE_PATH, await fetchOk("typst/adsumudi.typ"));
   return compiler;
 }
 

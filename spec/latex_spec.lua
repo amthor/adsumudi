@@ -1,5 +1,5 @@
-local latex = require("rechenblatt.latex")
-local view = require("rechenblatt.view")
+local latex = require("adsumudi.latex")
+local view = require("adsumudi.view")
 
 describe("latex.render", function()
   local sheet = {

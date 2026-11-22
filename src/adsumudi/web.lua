@@ -10,9 +10,9 @@
 -- has the right shape and types (the browser form cannot guarantee that).
 
 local json = require("dkjson.dkjson")
-local sheet = require("rechenblatt.sheet")
-local typst = require("rechenblatt.typst")
-local view = require("rechenblatt.view")
+local sheet = require("adsumudi.sheet")
+local typst = require("adsumudi.typst")
+local view = require("adsumudi.view")
 
 local M = {}
 
@@ -147,7 +147,7 @@ end
 -- @param request_json JSON {settings = {operations?, min?, max?, count?,
 --        minutes?, code?}, presentation = {title?, solutions?}}
 -- @return JSON {ok = true, code, count, description, title, source} where
---         source is the data for templates/rechenblatt.typ (sys.inputs.daten),
+--         source is the data for templates/adsumudi.typ (sys.inputs.daten),
 --         or {ok = false, error = message}
 function M.generate(request_json)
 	local ok, result = pcall(generate, request_json)

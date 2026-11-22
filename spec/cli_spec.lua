@@ -1,4 +1,4 @@
-local cli = require("rechenblatt.cli")
+local cli = require("adsumudi.cli")
 local json = require("dkjson.dkjson")
 
 -- In-memory stream that collects everything written to it.

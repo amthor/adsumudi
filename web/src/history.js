@@ -5,7 +5,7 @@
 // or blocked (private mode, disabled site data); then the history only lives
 // for the current page view.
 
-const STORAGE_KEY = "rechenblatt.history.v1";
+const STORAGE_KEY = "adsumudi.history.v1";
 const MAX_ENTRIES = 20;
 
 const dateFormat = new Intl.DateTimeFormat("de-DE", {

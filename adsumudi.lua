@@ -1,5 +1,5 @@
 #!/usr/bin/env lua
--- Rechenblatt: generates math practice worksheets (primary school) as PDF
+-- Adsumudi: generates math practice worksheets (primary school) as PDF
 -- (typeset with Typst, alternatively LaTeX).
 
 -- Module paths relative to the script (src/ for our modules, the root for
@@ -11,4 +11,4 @@ package.path = script_dir .. "/src/?.lua;" .. script_dir .. "/?.lua;" .. package
 -- ~/.luarocks. The LaTeX backend reports a missing etlua itself.
 pcall(require, "luarocks.loader")
 
-os.exit(require("rechenblatt.cli").main(arg))
+os.exit(require("adsumudi.cli").main(arg))

@@ -1,5 +1,5 @@
-local sheet_code = require("rechenblatt.sheet_code")
-local tasks = require("rechenblatt.tasks")
+local sheet_code = require("adsumudi.sheet_code")
+local tasks = require("adsumudi.tasks")
 
 describe("sheet_code", function()
 	local v = tasks.GENERATOR_VERSION

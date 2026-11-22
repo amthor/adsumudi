@@ -1,7 +1,7 @@
 local json = require("dkjson.dkjson")
-local sheet = require("rechenblatt.sheet")
-local typst = require("rechenblatt.typst")
-local web = require("rechenblatt.web")
+local sheet = require("adsumudi.sheet")
+local typst = require("adsumudi.typst")
+local web = require("adsumudi.web")
 
 -- Calls web.generate like the browser does: table -> JSON -> Lua -> JSON -> table.
 local function generate(request)

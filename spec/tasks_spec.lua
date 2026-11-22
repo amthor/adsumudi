@@ -1,6 +1,6 @@
-local tasks = require("rechenblatt.tasks")
-local rng = require("rechenblatt.rng")
-local sheet_code = require("rechenblatt.sheet_code")
+local tasks = require("adsumudi.tasks")
+local rng = require("adsumudi.rng")
+local sheet_code = require("adsumudi.sheet_code")
 
 describe("tasks.generate", function()
 	local function check_many(op, min, max, check)

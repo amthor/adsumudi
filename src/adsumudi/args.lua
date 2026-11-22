@@ -18,7 +18,7 @@ M.DEFAULTS = {
 M.BACKENDS = { typst = true, latex = true }
 
 M.HELP = [[
-Aufruf: lua rechenblatt.lua [Optionen]
+Aufruf: lua adsumudi.lua [Optionen]
 
 Erzeugt ein Mathe-Übungsblatt als PDF (Satz mit Typst, alternativ LaTeX).
 
@@ -43,11 +43,11 @@ Optionen:
   -h, --hilfe           diese Hilfe anzeigen
 
 Beispiele:
-  lua rechenblatt.lua
-  lua rechenblatt.lua -r mul,div --max 100 -n 30 -l -o mal.pdf
-  lua rechenblatt.lua -r +,-,*,: -t 10 --satz latex
-  lua rechenblatt.lua --blattcode 1-AS-1-100-22-48213 -l
-  lua rechenblatt.lua -t 5 -s 4711 -l --quelle -o templates/beispiel.json
+  lua adsumudi.lua
+  lua adsumudi.lua -r mul,div --max 100 -n 30 -l -o mal.pdf
+  lua adsumudi.lua -r +,-,*,: -t 10 --satz latex
+  lua adsumudi.lua --blattcode 1-AS-1-100-22-48213 -l
+  lua adsumudi.lua -t 5 -s 4711 -l --quelle -o templates/beispiel.json
 ]]
 
 local ALIASES = {

@@ -1,4 +1,4 @@
-local args = require("rechenblatt.args")
+local args = require("adsumudi.args")
 
 describe("args.parse", function()
 	it("liefert ohne Argumente leere Einstellungen und die Ausgabe-Voreinstellungen", function()

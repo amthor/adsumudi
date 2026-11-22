@@ -4,15 +4,15 @@
 -- selected backend (typst or latex), and turns errors into German messages
 -- and an exit code.
 
-local args = require("rechenblatt.args")
-local sheet = require("rechenblatt.sheet")
+local args = require("adsumudi.args")
+local sheet = require("adsumudi.sheet")
 
 local M = {}
 
 -- Backends share one interface: SOURCE_EXT, render(), build().
 local BACKENDS = {
-	typst = "rechenblatt.typst",
-	latex = "rechenblatt.latex",
+	typst = "adsumudi.typst",
+	latex = "adsumudi.latex",
 }
 
 --- Runs the CLI.
@@ -25,7 +25,7 @@ function M.main(argv, out, errout)
 	errout = errout or io.stderr
 
 	local function fail(message)
-		errout:write("Fehler: ", tostring(message), "\n", "Hilfe mit: lua rechenblatt.lua --hilfe\n")
+		errout:write("Fehler: ", tostring(message), "\n", "Hilfe mit: lua adsumudi.lua --hilfe\n")
 		return 1
 	end
 

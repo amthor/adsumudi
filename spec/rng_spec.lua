@@ -1,4 +1,4 @@
-local rng = require("rechenblatt.rng")
+local rng = require("adsumudi.rng")
 
 describe("rng.new", function()
 	it("liefert für Seed 1 die festgelegte Folge (plattform- und versionsunabhängig)", function()
