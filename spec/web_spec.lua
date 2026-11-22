@@ -40,13 +40,14 @@ describe("web.generate", function()
 	it("liefert für einen Blattcode exakt die Daten, die auch das CLI an Typst gibt", function()
 		local r = generate({ settings = { code = "1-AS-1-100-6-12345" }, presentation = { title = "Nachdruck" } })
 		assert.is_true(r.ok)
-		local expected = typst.render(sheet.generate({ code = "1-AS-1-100-6-12345" }), { title = "Nachdruck" })
+		local expected = typst.render(assert(sheet.generate({ code = "1-AS-1-100-6-12345" })), { title = "Nachdruck" })
 		assert.are.equal(expected, r.source)
 		assert.are.same({ art = "add", a = 85, b = 8, ergebnis = 93 }, json.decode(r.source).aufgaben[1])
 	end)
 
 	it("ein Blattcode hat Vorrang vor den übrigen Formularfeldern", function()
-		local r = generate({ settings = { code = " 1-as-1-100-6-12345 ", operations = { "mul" }, max = 20, minutes = 3 } })
+		local r =
+			generate({ settings = { code = " 1-as-1-100-6-12345 ", operations = { "mul" }, max = 20, minutes = 3 } })
 		assert.is_true(r.ok)
 		assert.are.equal("1-AS-1-100-6-12345", r.code)
 		assert.are.equal(json.null, json.decode(r.source, 1, json.null).minuten)
@@ -80,8 +81,8 @@ describe("web.generate", function()
 		}
 		for _, case in ipairs(cases) do
 			local r = json.decode(web.generate(case[1]))
-			assert.is_false(r.ok, case[1])
-			assert.truthy(r.error:find(case[2], 1, true), r.error)
+			assert.is_false(r.ok)
+			assert.matches(case[2], r.error, 1, true)
 		end
 	end)
 end)

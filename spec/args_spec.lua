@@ -26,7 +26,23 @@ describe("args.parse", function()
 	end)
 
 	it("trennt Blatt-Einstellungen von Ausgabe-Optionen", function()
-		local o = args.parse({ "-n", "8", "-t", "10", "--min", "2", "--max", "50", "-s", "7", "-l", "-o", "x.pdf", "--titel", "T" })
+		local o = args.parse({
+			"-n",
+			"8",
+			"-t",
+			"10",
+			"--min",
+			"2",
+			"--max",
+			"50",
+			"-s",
+			"7",
+			"-l",
+			"-o",
+			"x.pdf",
+			"--titel",
+			"T",
+		})
 		assert.are.same({ count = 8, minutes = 10, min = 2, max = 50, seed = 7 }, o.settings)
 		assert.is_true(o.solutions)
 		assert.are.equal("x.pdf", o.output)
@@ -66,11 +82,18 @@ describe("args.parse", function()
 	end)
 
 	it("--blattcode lässt sich nicht mit festlegenden Optionen kombinieren", function()
-		for _, extra in ipairs({ { "-r", "add" }, { "--min", "2" }, { "--max", "50" }, { "-n", "4" }, { "-t", "3" }, { "-s", "1" } }) do
+		for _, extra in ipairs({
+			{ "-r", "add" },
+			{ "--min", "2" },
+			{ "--max", "50" },
+			{ "-n", "4" },
+			{ "-t", "3" },
+			{ "-s", "1" },
+		}) do
 			local argv = { "--blattcode", "1-AS-1-100-22-1", extra[1], extra[2] }
-			local ok, msg = pcall(args.parse, argv)
-			assert.is_false(ok)
-			assert.truthy(msg:find("--blattcode kann nicht mit", 1, true))
+			assert.error_matches(function()
+				args.parse(argv)
+			end, "--blattcode kann nicht mit", 1, true)
 		end
 	end)
 end)

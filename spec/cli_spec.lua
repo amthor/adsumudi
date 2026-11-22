@@ -33,13 +33,16 @@ describe("cli.main", function()
 	it("Fehler liefern 1 mit Meldung", function()
 		local cases = {
 			{ { "--foo" }, "Fehler: unbekannte Option: --foo" },
-			{ { "--min", "60", "-r", "add", "--quelle" }, "Fehler: Rechenart 'add' ist im Zahlenbereich 60-100 nicht möglich" },
+			{
+				{ "--min", "60", "-r", "add", "--quelle" },
+				"Fehler: Rechenart 'add' ist im Zahlenbereich 60-100 nicht möglich",
+			},
 			{ { "-o", "blatt.tex" }, "Fehler: die Ausgabedatei muss auf .pdf enden" },
 		}
 		for _, case in ipairs(cases) do
 			local out, err = stream(), stream()
 			assert.are.equal(1, cli.main(case[1], out, err))
-			assert.truthy(err.text:find(case[2], 1, true), err.text)
+			assert.matches(case[2], err.text, 1, true)
 		end
 	end)
 
@@ -59,7 +62,10 @@ describe("cli.main", function()
 	it("--quelle schreibt bei LaTeX das .tex-Dokument", function()
 		local path = os.tmpname()
 		local out, err = stream(), stream()
-		assert.are.equal(0, cli.main({ "-c", "1-AS-1-100-6-12345", "--satz", "latex", "--quelle", "-o", path }, out, err))
+		assert.are.equal(
+			0,
+			cli.main({ "-c", "1-AS-1-100-6-12345", "--satz", "latex", "--quelle", "-o", path }, out, err)
+		)
 		local tex = read_file(path)
 		os.remove(path)
 		assert.truthy(tex:find("\\begin{document}", 1, true))
@@ -67,11 +73,9 @@ describe("cli.main", function()
 		assert.are.equal("", err.text)
 	end)
 
-	it("erzeugt mit Typst ein PDF (nur wenn typst installiert ist)", function()
-		if not command_exists("typst") then
-			pending("typst nicht installiert")
-			return
-		end
+	-- Without typst the test is only listed as pending.
+	local it_typst = command_exists("typst") and it or pending
+	it_typst("erzeugt mit Typst ein PDF (nur wenn typst installiert ist)", function()
 		local path = os.tmpname() .. ".pdf"
 		local out, err = stream(), stream()
 		assert.are.equal(0, cli.main({ "-c", "1-AS-1-100-6-12345", "-l", "-o", path }, out, err))

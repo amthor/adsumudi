@@ -52,6 +52,7 @@ describe("sheet.resolve", function()
 			local s, err = sheet.resolve(settings)
 			assert.is_nil(s)
 			assert.are.equal("string", type(err))
+			--- @cast err string
 			assert.falsy(err:find("%-%-")) -- frontend-neutral: no CLI flags
 		end
 	end)
