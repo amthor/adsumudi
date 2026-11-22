@@ -1,17 +1,30 @@
+-- sheet.lua
 -- Core API: turns sheet settings into a fully determined sheet.
 --
--- This is the one entry point every frontend uses (CLI today, GUI later).
--- It does no I/O and never exits the program: errors are returned as
--- `nil, message`, with messages that do not mention any CLI flags.
--- Presentation (title, solution page, output format) is not its business.
+-- This is the single entry point both frontends (CLI and web app) use. Does no
+-- I/O and never exits the program. Errors are returned as `nil, string`, with
+-- frontend-neutral messages (i.e., not relating to CLI flags). Logic here is
+-- oblivious to presentation details (title, solution page, output format).
 
 local tasks = require("adsumudi.tasks")
 local rng = require("adsumudi.rng")
 local sheet_code = require("adsumudi.sheet_code")
 
+--- Sheet data generated.
+--- @class SheetData
+--- @field tasks      Task[]
+--- @field operations Operation[]
+--- @field min        integer
+--- @field max        integer
+--- @field count      integer
+--- @field minutes    number?
+--- @field seed       integer
+--- @field code       string
+
 local M = {}
 
--- Domain defaults: addition and subtraction up to 100, enough for 5 minutes.
+--- Domain defaults: addition and subtraction up to 100, enough for 5 minutes.
+--- @type table
 M.DEFAULTS = {
 	min = 1,
 	max = 100,
@@ -19,6 +32,9 @@ M.DEFAULTS = {
 	minutes = 5,
 }
 
+--- Makes a shallow copy of table `list`.
+--- @param list table
+--- @return table
 local function copy_list(list)
 	local result = {}
 	for i, v in ipairs(list) do
@@ -27,11 +43,16 @@ local function copy_list(list)
 	return result
 end
 
+--- List of all operations declared in `tasks.lua`.
+--- @type { [string]: boolean }
 local KNOWN_OPERATIONS = {}
 for _, op in ipairs(tasks.OPERATIONS) do
 	KNOWN_OPERATIONS[op] = true
 end
 
+--- Validates settings.
+--  **Throws error:** validation fails.
+--- @param s Settings
 local function validate(s)
 	if #s.operations == 0 then
 		error("mindestens eine Rechenart muss gewählt sein", 0)
@@ -58,8 +79,14 @@ local function validate(s)
 	end
 end
 
+--- Resolves settings: apply defaults for options not given, validate resulting
+--- settings.
+--  **Throws error:** validation fails.
+--- @param settings Settings?
+--- @return Settings
 local function resolve(settings)
 	settings = settings or {}
+	--- @type Settings
 	local s = {
 		operations = copy_list(settings.operations or M.DEFAULTS.operations),
 		min = settings.min or M.DEFAULTS.min,
@@ -92,9 +119,9 @@ local function resolve(settings)
 end
 
 --- Applies defaults, a sheet code, validation, count and seed.
--- @param settings {operations?, min?, max?, count?, minutes?, seed?, code?}
---        count takes precedence over minutes; code overrides everything.
--- @return {operations, min, max, count, minutes?, seed} or nil, message
+--  `count` takes precedence over `minutes`; `code` overrides everything.
+--- @param settings Settings
+--- @return Settings|nil, string? if `nil`: append a German error message
 function M.resolve(settings)
 	local ok, result = pcall(resolve, settings)
 	if not ok then
@@ -104,9 +131,8 @@ function M.resolve(settings)
 end
 
 --- Generates a sheet.
--- @param settings see M.resolve
--- @return sheet {tasks, operations, min, max, count, minutes?, seed, code}
---         or nil, message
+--- @param settings Settings
+--- @return SheetData|nil, string? sheet data or `nil` and a message on error
 function M.generate(settings)
 	local s, err = M.resolve(settings)
 	if not s then

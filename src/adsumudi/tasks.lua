@@ -7,6 +7,13 @@
 --   * Multiplication/division avoid the trivial factors 0 and 1 whenever
 --     the number range allows it.
 
+--- Task description.
+--- @class Task
+--- @field op     Operation
+--- @field a      number
+--- @field b      number
+--- @field result number
+
 local M = {}
 
 -- Part of every sheet code. MUST be incremented whenever the same inputs

@@ -1,29 +1,33 @@
--- Command line frontend: argv -> core API -> backend -> PDF (or source).
+-- cli.lua
+-- Command line frontend.
 --
--- Contains no domain logic of its own; it only connects args, sheet and the
--- selected backend (typst or latex), and turns errors into German messages
--- and an exit code.
+-- Connects args, sheet and the selected backend, and turns errors into (German)
+-- messages and an exit code. Contains no domain logic of its own.
 
 local args = require("adsumudi.args")
 local sheet = require("adsumudi.sheet")
 
 local M = {}
 
--- Backends share one interface: SOURCE_EXT, render(), build().
+--- Backends interfaces.
+--- @type { [string]: string }
 local BACKENDS = {
 	typst = "adsumudi.typst",
 	latex = "adsumudi.latex",
 }
 
 --- Runs the CLI.
--- @param argv   list of arguments
--- @param out    stream for normal output (default io.stdout)
--- @param errout stream for error messages (default io.stderr)
--- @return exit code (0 = success, 1 = error)
+--- @param argv   string[] list of CL arguments
+--- @param out    file*?   stream for normal output (default io.stdout)
+--- @param errout file*?   stream for error messages (default io.stderr)
+--- @return integer exit code (0 = success, 1 = error)
 function M.main(argv, out, errout)
 	out = out or io.stdout
 	errout = errout or io.stderr
 
+	--- Bubble up any error message.
+	--- @param message any
+	--- @return integer
 	local function fail(message)
 		errout:write("Fehler: ", tostring(message), "\n", "Hilfe mit: lua adsumudi.lua --hilfe\n")
 		return 1
@@ -39,8 +43,7 @@ function M.main(argv, out, errout)
 	end
 
 	local backend = require(BACKENDS[opts.backend])
-	local output = opts.output
-		or (opts.source_only and "rechenblatt." .. backend.SOURCE_EXT or "rechenblatt.pdf")
+	local output = opts.output or (opts.source_only and "rechenblatt." .. backend.SOURCE_EXT or "rechenblatt.pdf")
 	if not opts.source_only and not output:match("%.pdf$") then
 		return fail("die Ausgabedatei muss auf .pdf enden (für die Quelle: --quelle)")
 	end

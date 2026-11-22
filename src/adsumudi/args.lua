@@ -1,12 +1,24 @@
--- Command line parsing: turns argv into sheet settings and output options.
+-- args.lua
+-- Command line parsing. Turns argv into sheet settings and output options.
 --
 -- Only knows about flags. Domain defaults, validation and the resolution of
 -- minutes and sheet codes live in the core API (sheet.lua).
 
+--- Settings type (input for sheet.generate).
+--- Holds only what was provided by the user.
+--- @class Settings
+--- @field operations Operation[]?
+--- @field min        integer?
+--- @field max        integer?
+--- @field count      integer?
+--- @field minutes    number?
+--- @field seed       integer?
+--- @field code       string?
+
 local M = {}
 
--- Output/presentation defaults of the CLI (domain defaults: sheet.DEFAULTS).
--- output = nil means: the CLI picks rechenblatt.pdf (or .json/.tex with --quelle).
+--- Output/presentation defaults of the CLI.
+--  output = nil means: the CLI picks rechenblatt.pdf (or .json/.tex with --quelle).
 M.DEFAULTS = {
 	backend = "typst",
 	source_only = false,
@@ -15,8 +27,13 @@ M.DEFAULTS = {
 	debug = false,
 }
 
+--- List of recognized backend strings.
+--  Can be explicitly set `false` to disable a backend for a build.
+--- @type { [string]: boolean }
 M.BACKENDS = { typst = true, latex = true }
 
+--- Help string.
+--- @type string
 M.HELP = [[
 Aufruf: lua adsumudi.lua [Optionen]
 
@@ -50,6 +67,8 @@ Beispiele:
   lua adsumudi.lua -t 5 -s 4711 -l --quelle -o templates/beispiel.json
 ]]
 
+--- Aliases for option values.
+--- @enum Operation
 local ALIASES = {
 	add = "add",
 	["+"] = "add",
@@ -67,6 +86,10 @@ local ALIASES = {
 	geteilt = "div",
 }
 
+--- Translates alternative strings to operation identifiers.
+--  **Might panic:** unknown operation; no operations given.
+--- @param text string
+--- @return Operation[]
 local function parse_operations(text)
 	local operations, seen = {}, {}
 	for part in text:gmatch("[^,%s]+") do
@@ -85,12 +108,18 @@ local function parse_operations(text)
 	return operations
 end
 
-local function number(name, value, integer)
+--- Translates a named argument to a number.
+--  **Might panic:** `tonumber` fails; `tointeger` fails while `is_integer` is set.
+--- @param name string
+--- @param value string
+--- @param is_integer boolean?
+--- @return number
+local function number(name, value, is_integer)
 	local n = tonumber(value)
 	if not n then
 		error(("%s erwartet eine Zahl, nicht '%s'"):format(name, tostring(value)), 0)
 	end
-	if integer then
+	if (is_integer ~= nil) and (is_integer == true) then
 		n = math.tointeger(n)
 		if not n then
 			error(name .. " erwartet eine ganze Zahl", 0)
@@ -100,10 +129,9 @@ local function number(name, value, integer)
 end
 
 --- Parses the arguments.
--- @return {settings, output?, backend, source_only, title, solutions, debug, help?}
---         settings holds only what was given: {operations?, min?, max?,
---         count?, minutes?, seed?, code?} (input for sheet.generate).
--- Errors are raised via error(msg, 0).
+--  Errors are raised via error(msg, 0).
+--- @param args string[]
+--- @return { settings: Settings, output: string?, backend: string?, source_only: boolean, title: string, solutions: boolean, debug: boolean, help: boolean? }
 function M.parse(args)
 	local o = {}
 	for key, v in pairs(M.DEFAULTS) do
@@ -114,6 +142,10 @@ function M.parse(args)
 	-- Options that a sheet code determines; remembered for the conflict check.
 	local explicit = {}
 	local i = 1
+	---  Gets the value of a named option.
+	--   **Might panic:** missing value for a mandatory option.
+	--- @param name string
+	--- @return string
 	local function value(name)
 		i = i + 1
 		local v = args[i]
