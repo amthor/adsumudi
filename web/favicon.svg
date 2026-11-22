@@ -14,7 +14,7 @@
   <sodipodi:namedview
      id="namedview1"
      pagecolor="#ffffff"
-     bordercolor="#999999"
+     bordercolor="#b8ac9e"
      borderopacity="1"
      inkscape:showpageshadow="2"
      inkscape:pageopacity="0"
@@ -33,22 +33,22 @@
      width="64"
      height="64"
      rx="14"
-     fill="#0a6cd6"
+     fill="#a9480f"
      id="rect1" />
   <path
      d="m 36.930705,18.638484 q -0.850666,0.02933 -1.466665,-0.557332 -0.616,-0.616 -0.586666,-1.466665 -0.02933,-0.850666 0.557332,-1.437332 0.616,-0.615999 1.466665,-0.645333 h 14.138651 q 0.850665,-0.02933 1.437331,0.586666 0.616,0.586666 0.645333,1.437332 0,0.850666 -0.586666,1.466665 -0.586666,0.586666 -1.437332,0.615999 z"
      id="text1"
-     style="font-size:29.3333px;line-height:1.25;font-family:'Blokletters Viltstift';-inkscape-font-specification:'Blokletters Viltstift';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;stroke-width:0.752126"
+     style="font-size:29.3333px;line-height:1.25;font-family:'Blokletters Viltstift';-inkscape-font-specification:'Blokletters Viltstift';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#f1e9df;stroke-width:0.752126"
      aria-label="–" />
   <path
      d="m 17.321066,19.174882 h -4.751995 q -0.850665,0.02933 -1.466665,-0.557332 -0.615999,-0.616 -0.586666,-1.466665 -0.02933,-0.850666 0.557333,-1.437332 0.615999,-0.615999 1.466665,-0.645333 h 5.250661 l 0.703999,-6.2479925 q 0.088,-0.8506657 0.733332,-1.3786651 0.674666,-0.5573327 1.525332,-0.4399995 0.850666,0.088 1.378665,0.7626658 0.527999,0.6453326 0.439999,1.4959983 l -0.674665,5.807993 h 4.781327 q 0.850666,-0.02933 1.437332,0.586666 0.615999,0.586666 0.645333,1.437332 0,0.850666 -0.586666,1.466665 -0.586666,0.586666 -1.437332,0.615999 h -5.279994 l -0.703999,6.247993 q -0.088,0.850666 -0.762666,1.378665 -0.645332,0.528 -1.495998,0.44 -0.850666,-0.088 -1.378665,-0.762666 -0.528,-0.645333 -0.44,-1.495998 z"
      id="text3"
-     style="font-size:29.3333px;line-height:1.25;font-family:'Blokletters Viltstift';-inkscape-font-specification:'Blokletters Viltstift';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;stroke-width:0.752126"
+     style="font-size:29.3333px;line-height:1.25;font-family:'Blokletters Viltstift';-inkscape-font-specification:'Blokletters Viltstift';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#f1e9df;stroke-width:0.752126"
      aria-label="+" />
   <path
      d="m 15.372051,52.01441 q -0.288,0.624 -0.936,0.864 -0.648,0.264 -1.272,0 -0.648,-0.288 -0.912,-0.936 -0.24,-0.648 0.024,-1.272 0.192,-0.432 0.6,-1.08 0.408,-0.648 0.96,-1.416 0.576,-0.792 1.248,-1.68 0.672,-0.888 1.392,-1.8 -0.576,-0.936 -1.128,-1.848 -0.528,-0.912 -1.008,-1.752 -0.456,-0.84 -0.816,-1.56 -0.36,-0.744 -0.552,-1.296 -0.24,-0.648 0.048,-1.272 0.312,-0.624 0.984,-0.864 0.648,-0.24 1.272,0.072 0.624,0.312 0.864,0.96 0.288,0.816 0.96,2.064 0.696,1.248 1.56,2.688 0.6,-0.768 1.128,-1.44 0.528,-0.696 0.912,-1.248 0.408,-0.552 0.648,-0.912 0.264,-0.384 0.288,-0.504 0.12,-0.696 0.696,-1.08 0.576,-0.384 1.272,-0.24 0.696,0.12 1.08,0.696 0.384,0.576 0.24,1.272 -0.072,0.408 -0.48,1.08 -0.384,0.672 -0.984,1.512 -0.576,0.84 -1.344,1.824 -0.744,0.984 -1.536,2.04 0.72,1.104 1.392,2.088 0.672,0.984 1.176,1.752 0.528,0.744 0.84,1.2 0.336,0.456 0.336,0.456 0.312,0.408 0.312,0.96 0,0.408 -0.192,0.768 -0.168,0.36 -0.504,0.6 -0.432,0.288 -0.96,0.288 -0.408,0 -0.768,-0.192 -0.36,-0.168 -0.624,-0.504 0,0 -0.264,-0.36 -0.264,-0.36 -0.696,-0.984 -0.432,-0.624 -1.008,-1.464 -0.552,-0.864 -1.2,-1.824 -0.552,0.72 -1.056,1.392 -0.504,0.648 -0.912,1.224 -0.408,0.552 -0.696,1.008 -0.264,0.432 -0.384,0.72 z"
      id="text4"
-     style="font-size:24px;line-height:1.25;font-family:'Blokletters Viltstift';-inkscape-font-specification:'Blokletters Viltstift';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;stroke-width:0.752126"
+     style="font-size:24px;line-height:1.25;font-family:'Blokletters Viltstift';-inkscape-font-specification:'Blokletters Viltstift';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#f1e9df;stroke-width:0.752126"
      aria-label="x" />
   <g
      id="g6"
@@ -56,12 +56,12 @@
     <path
        d="m 30.606651,52.914647 q -0.410667,-0.05867 -0.762666,-0.293333 -0.352,-0.205334 -0.586666,-0.528 -0.234667,-0.293333 -0.352,-0.703999 -0.088,-0.381333 -0.02933,-0.821332 0.117333,-0.850666 0.762666,-1.349332 0.674666,-0.498666 1.525331,-0.381333 l 0.909333,0.117333 q 0.410666,0.05867 0.762665,0.293333 0.352,0.205333 0.586666,0.527999 0.234667,0.293333 0.322667,0.704 0.117333,0.381333 0.05867,0.821332 -0.117333,0.850666 -0.791999,1.349332 -0.645332,0.498666 -1.495998,0.381333 z M 31.955982,39.714662 Q 31.13465,39.567995 30.606651,38.893329 30.107984,38.218663 30.225318,37.367998 30.342651,36.517332 30.987983,36.018666 31.662649,35.52 32.513315,35.637333 l 0.909332,0.117333 q 0.410666,0.05867 0.762666,0.293333 0.352,0.205333 0.586666,0.528 0.234666,0.293333 0.322666,0.703999 0.117334,0.381333 0.05867,0.821332 -0.117333,0.850666 -0.791999,1.349332 -0.645333,0.498666 -1.495998,0.381333 z"
        id="text5"
-       style="font-size:29.3333px;line-height:1.25;font-family:'Blokletters Viltstift';-inkscape-font-specification:'Blokletters Viltstift';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;stroke-width:0.752126"
+       style="font-size:29.3333px;line-height:1.25;font-family:'Blokletters Viltstift';-inkscape-font-specification:'Blokletters Viltstift';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#f1e9df;stroke-width:0.752126"
        aria-label=":" />
     <path
        d="m 25.067008,46.392299 q -0.850666,0.02933 -1.466665,-0.557333 -0.616,-0.615999 -0.586666,-1.466665 -0.02933,-0.850665 0.557332,-1.437331 0.616,-0.616 1.466665,-0.645333 h 14.138651 q 0.850665,-0.02933 1.437331,0.586666 0.616,0.586666 0.645333,1.437332 0,0.850665 -0.586666,1.466665 -0.586666,0.586666 -1.437332,0.615999 z"
        id="text6"
-       style="font-size:29.3333px;line-height:1.25;font-family:'Blokletters Viltstift';-inkscape-font-specification:'Blokletters Viltstift';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;stroke-width:0.752126"
+       style="font-size:29.3333px;line-height:1.25;font-family:'Blokletters Viltstift';-inkscape-font-specification:'Blokletters Viltstift';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#f1e9df;stroke-width:0.752126"
        aria-label="–" />
   </g>
 </svg>
