@@ -1,3 +1,4 @@
+-- sheet_code.lua
 -- Sheet code ("Blattcode"): everything needed to regenerate a sheet's tasks.
 --
 -- Format: <version>-<operations>-<min>-<max>-<count>-<seed>, e.g. 1-AS-1-100-22-48213
@@ -12,11 +13,18 @@ local tasks = require("adsumudi.tasks")
 
 local M = {}
 
+--- Code letter per operation.
+--- @type { [Operation]: string }
 local LETTER = { add = "A", sub = "S", mul = "M", div = "D" }
+
+--- Operation per code letter.
+--- @type { [string]: Operation }
 local OPERATION = { A = "add", S = "sub", M = "mul", D = "div" }
 
---- Builds the sheet code from fully resolved options.
--- @param opts {operations, min, max, count, seed}
+--- Builds the sheet code from fully resolved settings.
+--  **Throws error:** unknown operation.
+--- @param opts ResolvedSettings
+--- @return string
 function M.encode(opts)
 	local letters = {}
 	for i, op in ipairs(opts.operations) do
@@ -32,21 +40,35 @@ function M.encode(opts)
 	)
 end
 
+--- Rejects a sheet code.
+--  **Throws error:** always, with a German message naming the code.
+--- @param code   string
+--- @param reason string
 local function fail(code, reason)
 	error(("ungültiger Blattcode '%s': %s"):format(code, reason), 0)
 end
 
+--- Parses one numeric part of a sheet code.
+--  **Throws error:** not a non-negative integer.
+--- @param code  string whole code, for the message
+--- @param field string German field name, for the message
+--- @param text  string
+--- @return integer
 local function parse_number(code, field, text)
 	if not text:match("^%d+$") then
 		fail(code, ("%s muss eine nicht-negative ganze Zahl sein, nicht '%s'"):format(field, text))
 	end
-	return math.tointeger(tonumber(text))
+	return math.tointeger(tonumber(text)) --[[@as integer]]
 end
 
---- Parses a sheet code. Case-insensitive, surrounding whitespace is ignored.
--- @return {operations, min, max, count, seed}; errors are raised via error(msg, 0)
+--- Parses a sheet code.
+--  Case-insensitive, surrounding whitespace is ignored.
+--  **Throws error:** malformed code or other generator version.
+--- @param input string
+--- @return ResolvedSettings without minutes
 function M.decode(input)
 	local code = tostring(input):match("^%s*(.-)%s*$"):upper()
+	--- @type string[]
 	local parts = {}
 	for part in (code .. "-"):gmatch("([^-]*)-") do
 		parts[#parts + 1] = part
@@ -63,7 +85,10 @@ function M.decode(input)
 		)
 	end
 
-	local operations, seen = {}, {}
+	--- @type Operation[]
+	local operations = {}
+	--- @type { [Operation]: boolean }
+	local seen = {}
 	if parts[2] == "" then
 		fail(code, "keine Rechenarten angegeben")
 	end
