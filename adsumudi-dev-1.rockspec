@@ -5,7 +5,8 @@ source = {
 	url = ".",
 }
 description = {
-	summary = "Mathe-Übungsblätter für die Grundschule als PDF (Typst, alternativ LaTeX)",
+	summary = "Mathe-Übungsblätter für die Grundschule als PDF",
+	license = "MIT",
 }
 dependencies = {
 	"lua >= 5.3",

@@ -1,12 +1,19 @@
 // Assembles web/dist/, the complete static site.
 //
-// No bundler: this only copies files. The Lua sources, the Typst template and
-// the fonts come straight from the project, so CLI and web always share one
-// source. Everything is served from dist/ exactly as it will be hosted.
+// No bundler, this only copies files. Lua sources, the Typst template and
+// fonts come directly from the project, such that CLI and web always share the same
+// sources. Served from dist/ (as it will be hosted).
 //
 //   npm run build        (from web/)
 
-import { copyFileSync, cpSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import {
+  copyFileSync,
+  cpSync,
+  mkdirSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -36,31 +43,59 @@ cpSync(join(web, "src"), join(dist, "src"), { recursive: true });
 
 // Lua core. All modules are copied; only the ones web.lua requires get loaded.
 const luaFiles = [];
-for (const name of readdirSync(join(root, "src", "adsumudi")).filter((n) => n.endsWith(".lua"))) {
+for (const name of readdirSync(join(root, "src", "adsumudi")).filter((n) =>
+  n.endsWith(".lua"),
+)) {
   luaFiles.push(`adsumudi/${name}`);
 }
 luaFiles.push("dkjson/dkjson.lua");
 for (const file of luaFiles) {
-  const source = file.startsWith("dkjson/") ? join(root, file) : join(root, "src", file);
+  const source = file.startsWith("dkjson/")
+    ? join(root, file)
+    : join(root, "src", file);
   copy(source, join(dist, "lua", file));
 }
-writeFileSync(join(dist, "lua-files.json"), JSON.stringify(luaFiles, null, 2) + "\n");
+writeFileSync(
+  join(dist, "lua-files.json"),
+  JSON.stringify(luaFiles, null, 2) + "\n",
+);
 
 // Typst template and fonts (with their license).
-copy(join(root, "templates", "adsumudi.typ"), join(dist, "typst", "adsumudi.typ"));
+copy(
+  join(root, "templates", "adsumudi.typ"),
+  join(dist, "typst", "adsumudi.typ"),
+);
 copyMatching(join(root, "fonts"), join(dist, "fonts"), /\.otf$|^OFL\.txt$/);
 
 // Third-party runtime files.
-copyMatching(join(modules, "wasmoon", "dist"), join(dist, "vendor", "wasmoon"), /^index\.js$|^glue\.wasm$/);
-copy(join(modules, "wasmoon", "LICENSE"), join(dist, "vendor", "wasmoon", "LICENSE"));
-cpSync(join(modules, "@myriaddreamin", "typst.ts", "dist", "esm"), join(dist, "vendor", "typst.ts"), {
-  recursive: true,
-  filter: (path) => !/\.d\.mts$|\.map$/.test(path),
-});
+copyMatching(
+  join(modules, "wasmoon", "dist"),
+  join(dist, "vendor", "wasmoon"),
+  /^index\.js$|^glue\.wasm$/,
+);
+copy(
+  join(modules, "wasmoon", "LICENSE"),
+  join(dist, "vendor", "wasmoon", "LICENSE"),
+);
+cpSync(
+  join(modules, "@myriaddreamin", "typst.ts", "dist", "esm"),
+  join(dist, "vendor", "typst.ts"),
+  {
+    recursive: true,
+    filter: (path) => !/\.d\.mts$|\.map$/.test(path),
+  },
+);
 copyMatching(
   join(modules, "@myriaddreamin", "typst-ts-web-compiler", "pkg"),
   join(dist, "vendor", "typst-ts-web-compiler"),
   /\.mjs$|_bg\.wasm$/,
 );
+// Apache-2.0 requires the license text alongside redistributed files. The
+// compiler package ships none, but comes from the same typst.ts project.
+const typstLicense = join(modules, "@myriaddreamin", "typst.ts", "LICENSE");
+copy(typstLicense, join(dist, "vendor", "typst.ts", "LICENSE"));
+copy(typstLicense, join(dist, "vendor", "typst-ts-web-compiler", "LICENSE"));
 
-console.log(`dist/ gebaut: ${luaFiles.length} Lua-Dateien, Template, Schriften, Wasmoon, typst.ts`);
+console.log(
+  `dist/ gebaut: ${luaFiles.length} Lua-Dateien, Template, Schriften, Wasmoon, typst.ts`,
+);

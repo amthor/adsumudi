@@ -172,6 +172,16 @@ gegen die veröffentlichte Seite:
 cd web && E2E_URL=https://amthor.github.io/adsumudi/ npm test
 ```
 
+## Lizenz
+
+Adsumudi selbst steht unter [MIT-Lizenz](LICENSE). Folgende mitgelieferten
+Teile benutzen jeweils eigene Lizenzen:
+
+- Fira Sans (`fonts/`): SIL Open Font License 1.1 (`fonts/OFL.txt`)
+- dkjson (`dkjson/`): MIT, Copyright David Heiko Kolf
+- [Wasmoon] (MIT) für die Web-Oberfläche und [typst.ts] (Apache-2.0) aus npm
+  (Lizenztexte nach dem Build in `web/dist/vendor/`)
+
 [Typst]: https://typst.app
 [LaTeX]: https://www.latex-project.org/
 [etlua]: https://github.com/leafo/etlua
