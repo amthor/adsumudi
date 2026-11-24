@@ -1,18 +1,24 @@
--- LaTeX backend (alternative to Typst, --satz latex): fills
--- templates/adsumudi.tex.etlua with the template view (view.lua) and adds
--- what is LaTeX-specific: escaping and TeX operator symbols. The layout lives
--- entirely in the template. Same backend interface as typst.lua.
---
--- etlua is loaded only when this backend is actually used, so the default
--- Typst backend works without it.
+-- latex.lua
+-- LaTeX backend: fills templates/adsumudi.tex.etlua with the template view
+-- (view.lua), does LaTeX escaping and TeX operator symbols.
+-- Same backend interface as typst.lua.
+
+--- Template view plus what only the LaTeX template needs.
+--- @class LatexView : View
+--- @field operator { [Operation]: string } TeX operator symbols
 
 local view = require("adsumudi.view")
 local shell = require("adsumudi.shell")
 
+--- @class LatexBackend : Backend
 local M = {}
 
+--- Complete .tex filename.
+--- @type string
 M.SOURCE_EXT = "tex"
 
+--- TeX operator symbol per operation.
+--- @type { [Operation]: string }
 local OPERATOR = {
 	add = "+",
 	sub = "-",
@@ -20,10 +26,16 @@ local OPERATOR = {
 	div = ":",
 }
 
--- The template is located relative to this module: src/adsumudi/ -> ../../templates/
+--- Directory of this module (template relative to it).
+--- @type string
 local MODULE_DIR = debug.getinfo(1, "S").source:match("^@(.*)[/\\]") or "."
+
+--- Path of etlua template: src/adsumudi/ -> ../../templates/
+--- @type string
 M.TEMPLATE_PATH = MODULE_DIR .. "/../../templates/adsumudi.tex.etlua"
 
+--- Replacement of LaTeX special characters.
+--- @type { [string]: string }
 local TEX_SPECIAL_CHARS = {
 	["\\"] = "\\textbackslash{}",
 	["{"] = "\\{",
@@ -38,11 +50,21 @@ local TEX_SPECIAL_CHARS = {
 }
 
 --- Escapes LaTeX special characters in free text (e.g. --titel).
+--- @param text any converted with tostring
+--- @return string
 function M.escape(text)
 	return (tostring(text):gsub("[\\{}#$%%&_^~]", TEX_SPECIAL_CHARS))
 end
 
+--- Compiled template, cached after the first use.
+--- @type (fun(data: LatexView): string)?
 local compiled
+
+--- Loads etlua and compiles the template (once).
+--  etlua is loaded only when this backend is actually used (the default
+--  Typst backend works without it).
+--  **Throws error:** etlua is not installed; template missing or invalid.
+--- @return fun(data: LatexView): string
 local function template()
 	if not compiled then
 		local found, etlua = pcall(require, "etlua")
@@ -60,11 +82,13 @@ local function template()
 	return compiled
 end
 
---- Builds the complete .tex document (raises an error if etlua is missing).
--- @param sheet        result of sheet.generate
--- @param presentation {title?, solutions?, debug?}
+--- Builds the complete .tex document.
+--  **Throws error:** etlua is not installed.
+--- @param sheet        SheetData
+--- @param presentation Presentation?
+--- @return string
 function M.render(sheet, presentation)
-	local data = view.build(sheet, presentation)
+	local data = view.build(sheet, presentation) --[[@as LatexView]]
 	data.titel = M.escape(data.titel)
 	data.blattcode = data.blattcode and M.escape(data.blattcode)
 	data.operator = OPERATOR
@@ -72,12 +96,12 @@ function M.render(sheet, presentation)
 end
 
 --- Compiles the PDF with lualatex.
--- The .tex file is written next to the PDF (same name, .tex) and removed
--- afterwards together with .aux/.log, unless options.keep_files (debug mode).
--- @param source   .tex document from M.render
--- @param pdf_path path of the PDF to create; must end in .pdf
--- @param options  {keep_files?}
--- @return pdf_path, or nil, message
+--  The .tex file is written next to the PDF (same name, .tex) and removed
+--  afterwards together with .aux/.log, unless options.keep_files (debug mode).
+--- @param source   string        .tex document from M.render
+--- @param pdf_path string        path of the PDF to create; must end in .pdf
+--- @param options  BuildOptions?
+--- @return string|nil, string? pdf_path on success; else nil and a message
 function M.build(source, pdf_path, options)
 	options = options or {}
 	local base = pdf_path:gsub("%.pdf$", "")

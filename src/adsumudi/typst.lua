@@ -1,26 +1,47 @@
+-- typst.lua
 -- Typst backend (default): serializes the template view (view.lua) to JSON,
--- which templates/adsumudi.typ reads via sys.inputs. Unlike LaTeX, no
--- escaping is needed: Typst inserts JSON strings literally, never as markup.
---
--- Backend interface (shared with latex.lua):
---   SOURCE_EXT                         extension of the source (--quelle)
---   render(sheet, presentation)        -> source text
---   build(source, pdf_path, options)   -> pdf_path, or nil, message
+-- which templates/adsumudi.typ reads via `sys.inputs`.
+
+--- Options for building the PDF.
+--- @class BuildOptions
+--- @field keep_files boolean? keep intermediate files (debug mode; LaTeX only)
+
+--- Interface of a rendering backend (typst.lua, latex.lua).
+--- @class Backend
+--- @field SOURCE_EXT string source file extension
+--- @field render     fun(sheet: SheetData, presentation: Presentation?): string
+--- @field build      fun(source: string, pdf_path: string, options: BuildOptions?): string|nil, string?
 
 local json = require("dkjson.dkjson")
 local view = require("adsumudi.view")
 local shell = require("adsumudi.shell")
 
+--- Template view as JSON data.
+--- @class TypstData : View
+--- @field blattcode string|table sheet code (or `json.null`)
+--- @field minuten   string|table display string (or `json.null`)
+
+--- @class TypstBackend : Backend
 local M = {}
 
+--- Extension of the source (JSON template data).
+--- @type string
 M.SOURCE_EXT = "json"
 
--- Project root relative to this module: src/adsumudi/ -> ../../
+--- Project root relative to this module.
+--- @type string
 local ROOT = (debug.getinfo(1, "S").source:match("^@(.*)[/\\]") or ".") .. "/../.."
+
+--- Path of the Typst template.
+--- @type string
 M.TEMPLATE_PATH = ROOT .. "/templates/adsumudi.typ"
+
+--- Directory of the bundled fonts (the only ones Typst may use).
+--- @type string
 M.FONT_DIR = ROOT .. "/fonts"
 
--- Stable, readable key order in the JSON output.
+--- Stable, readable key order in the JSON output.
+--- @type string[]
 local KEY_ORDER = {
 	"titel",
 	"beschreibung",
@@ -38,11 +59,11 @@ local KEY_ORDER = {
 }
 
 --- Builds the JSON data for the Typst template.
--- @param sheet        result of sheet.generate
--- @param presentation {title?, solutions?, debug?}
--- @return JSON string
+--- @param sheet        SheetData
+--- @param presentation Presentation?
+--- @return string JSON
 function M.render(sheet, presentation)
-	local data = view.build(sheet, presentation)
+	local data = view.build(sheet, presentation) --[[@as TypstData]]
 	-- Explicit null instead of a missing key, so the template can rely on
 	-- every field being present.
 	data.blattcode = data.blattcode or json.null
@@ -51,11 +72,12 @@ function M.render(sheet, presentation)
 end
 
 --- Compiles the PDF with the typst CLI.
--- Only the bundled fonts are used (--ignore-system-fonts), so the result is
--- the same on every machine.
--- @param source   JSON from M.render
--- @param pdf_path path of the PDF to create
--- @return pdf_path, or nil, message (including typst's own error output)
+--  Only the bundled fonts are used (--ignore-system-fonts), so the result is
+--  the same on every machine.
+--  **Throws error:** the shell cannot be started.
+--- @param source   string JSON from M.render
+--- @param pdf_path string path of the PDF to create
+--- @return string|nil, string? pdf_path on success; else nil and a message with typst's output
 function M.build(source, pdf_path)
 	local cmd = table.concat({
 		"typst compile --ignore-system-fonts",
@@ -65,7 +87,7 @@ function M.build(source, pdf_path)
 		shell.quote(pdf_path),
 		"2>&1",
 	}, " ")
-	local proc = io.popen(cmd, "r")
+	local proc = assert(io.popen(cmd, "r"))
 	local output = proc:read("a")
 	local ok, _, code = proc:close()
 	if ok then
