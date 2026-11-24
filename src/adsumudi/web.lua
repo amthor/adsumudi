@@ -1,3 +1,4 @@
+-- web.lua
 -- Web frontend adapter: JSON request -> sheet -> Typst data, JSON response.
 --
 -- Counterpart of cli.lua for the browser GUI in web/. The page talks to Lua
@@ -9,6 +10,29 @@
 -- validation stays in sheet.lua. This module only checks that the request
 -- has the right shape and types (the browser form cannot guarantee that).
 
+--- Settings part of a request, as decoded from JSON (unchecked).
+--- @class WebSettings
+--- @field operations any expected: string[]
+--- @field min        any expected: integer
+--- @field max        any expected: integer
+--- @field count      any expected: integer
+--- @field minutes    any expected: number
+--- @field code       any expected: string
+
+--- Presentation part of a request, as decoded from JSON (unchecked).
+--- @class WebPresentation
+--- @field title     any expected: string
+--- @field solutions any expected: boolean
+
+--- Successful response, before JSON encoding.
+--- @class WebResult
+--- @field ok          true
+--- @field code        string
+--- @field count       integer
+--- @field description string
+--- @field title       string
+--- @field source      string data for templates/adsumudi.typ (sys.inputs.daten)
+
 local json = require("dkjson.dkjson")
 local sheet = require("adsumudi.sheet")
 local typst = require("adsumudi.typst")
@@ -16,9 +40,12 @@ local view = require("adsumudi.view")
 
 local M = {}
 
+--- Title used when the request has none.
+--- @type string
 M.DEFAULT_TITLE = "Rechenblatt"
 
--- Stable key order for responses (dkjson otherwise follows pairs()).
+--- Stable key order for responses (dkjson otherwise follows pairs()).
+--- @type string[]
 local KEY_ORDER = {
 	"ok",
 	"error",
@@ -33,12 +60,20 @@ local KEY_ORDER = {
 	"source",
 }
 
+--- Encodes a response.
+--- @param value table
+--- @return string JSON
 local function encode(value)
-	return json.encode(value, { keyorder = KEY_ORDER })
+	return json.encode(value, { keyorder = KEY_ORDER }) --[[@as string]]
 end
 
 -- Input checks. Names in messages are the German field labels of the form.
 
+--- Checks an optional integer.
+--  **Throws error:** not an integer.
+--- @param value any
+--- @param label string German field label
+--- @return integer?
 local function integer(value, label)
 	if value == nil then
 		return nil
@@ -50,6 +85,11 @@ local function integer(value, label)
 	return n
 end
 
+--- Checks an optional number.
+--  **Throws error:** not a number.
+--- @param value any
+--- @param label string German field label
+--- @return number?
 local function number(value, label)
 	if value ~= nil and type(value) ~= "number" then
 		error(label .. " muss eine Zahl sein", 0)
@@ -57,6 +97,11 @@ local function number(value, label)
 	return value
 end
 
+--- Checks an optional string.
+--  **Throws error:** not a string.
+--- @param value any
+--- @param label string German field label
+--- @return string?
 local function text(value, label)
 	if value ~= nil and type(value) ~= "string" then
 		error(label .. " muss ein Text sein", 0)
@@ -64,6 +109,11 @@ local function text(value, label)
 	return value
 end
 
+--- Checks an optional list of operation names.
+--  The names themselves are validated by sheet.lua.
+--  **Throws error:** not a list, or an element is not a string.
+--- @param value any
+--- @return string[]?
 local function operations(value)
 	if value == nil then
 		return nil
@@ -71,6 +121,7 @@ local function operations(value)
 	if type(value) ~= "table" then
 		error("die Rechenarten müssen eine Liste sein", 0)
 	end
+	--- @type string[]
 	local list = {}
 	for i, op in ipairs(value) do
 		list[i] = text(op, "eine Rechenart")
@@ -78,6 +129,11 @@ local function operations(value)
 	return list
 end
 
+--- Checks an optional object of the request.
+--  **Throws error:** not a table.
+--- @param value any
+--- @param label string name of the request part, for the message
+--- @return table
 local function object(value, label)
 	if value == nil then
 		return {}
@@ -89,7 +145,8 @@ local function object(value, label)
 end
 
 --- Settings the form starts with: the domain defaults plus the default title.
--- @return JSON {operations, min, max, minutes, title}
+--  Response: JSON {operations, min, max, minutes, title}.
+--- @return string JSON
 function M.defaults()
 	local d = sheet.DEFAULTS
 	return encode({
@@ -101,17 +158,24 @@ function M.defaults()
 	})
 end
 
+--- Checks the request and generates the sheet.
+--  **Throws error:** invalid request, or the sheet cannot be generated.
+--- @param request_json string
+--- @return WebResult
 local function generate(request_json)
 	local request, _, err = json.decode(request_json)
 	-- dkjson marks decoded arrays with __jsontype = "array"; only objects are valid.
 	if type(request) ~= "table" or (getmetatable(request) or {}).__jsontype == "array" then
 		error("ungültige Anfrage: " .. tostring(err or "kein JSON-Objekt"), 0)
 	end
+	--- @type WebSettings
 	local s = object(request.settings, "settings")
+	--- @type WebPresentation
 	local p = object(request.presentation, "presentation")
 
 	-- A sheet code overrides everything else (sheet.resolve), so the form may
 	-- send its other fields along unchanged.
+	--- @type Settings
 	local settings = {
 		operations = operations(s.operations),
 		min = integer(s.min, "Min"),
@@ -144,11 +208,11 @@ local function generate(request_json)
 end
 
 --- Generates a sheet for the web frontend.
--- @param request_json JSON {settings = {operations?, min?, max?, count?,
---        minutes?, code?}, presentation = {title?, solutions?}}
--- @return JSON {ok = true, code, count, description, title, source} where
---         source is the data for templates/adsumudi.typ (sys.inputs.daten),
---         or {ok = false, error = message}
+--  Request: JSON {settings = {operations?, min?, max?, count?, minutes?, code?},
+--  presentation = {title?, solutions?}} (see WebSettings, WebPresentation).
+--  Response: JSON of a WebResult, or {ok = false, error = message}.
+--- @param request_json string JSON
+--- @return string JSON
 function M.generate(request_json)
 	local ok, result = pcall(generate, request_json)
 	if not ok then

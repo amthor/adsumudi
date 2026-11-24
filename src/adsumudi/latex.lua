@@ -96,14 +96,13 @@ function M.render(sheet, presentation)
 end
 
 --- Compiles the PDF with lualatex.
---  The .tex file is written next to the PDF (same name, .tex) and removed
---  afterwards together with .aux/.log, unless options.keep_files (debug mode).
 --- @param source   string        .tex document from M.render
 --- @param pdf_path string        path of the PDF to create; must end in .pdf
 --- @param options  BuildOptions?
 --- @return string|nil, string? pdf_path on success; else nil and a message
 function M.build(source, pdf_path, options)
 	options = options or {}
+	-- .tex file is written next to the PDF (same name)
 	local base = pdf_path:gsub("%.pdf$", "")
 	local tex_path = base .. ".tex"
 	local f, err = io.open(tex_path, "w")
@@ -136,8 +135,9 @@ function M.build(source, pdf_path, options)
 		end
 	end
 
-	-- Remove auxiliary files
+	-- Remove .aux file
 	os.remove(base .. ".aux")
+	-- remove tex and log file, unless `options.keep_files`
 	if not options.keep_files then
 		os.remove(base .. ".log")
 		os.remove(tex_path)
