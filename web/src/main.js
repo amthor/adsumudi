@@ -69,7 +69,7 @@ engine.luaReady
   .then(async ({ ms }) => {
     const def = await engine.defaults();
     form.fill(def);
-    diagnostics.log(`(Adsumudi ${def.version})`);
+    diagnostics.log(`Adsumudi ${def.version}`);
     diagnostics.log(`Rechenkern (Lua) bereit nach ${ms} ms`);
     $("form-fields").disabled = false;
     if (!typstReady) {
