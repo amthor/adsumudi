@@ -163,13 +163,13 @@ alles aus dem Browser-Cache.
 
 ## Geplante Erweiterungen
 
-- Division mit Rest ermöglichen
-- negative Zahlenraumgrenzen erlauben
-- Option für Lücken auch für Operanden, nicht nur für das Ergebnis
-- Option für Zehnerübergang
-- Option für Ergebnisse auch außerhalb des Zahlenraums
-- Option zum Vermeiden kommutativ identischer Aufgaben
-- Zeitbedarf-Schätzungen als Option einstellbar
+- [ ] Division mit Rest ermöglichen
+- [ ] negative Zahlenraumgrenzen erlauben
+- [ ] Option für Lücken auch für Operanden, nicht nur für das Ergebnis
+- [ ] Option für Zehnerübergang
+- [ ] Option für Ergebnisse auch außerhalb des Zahlenraums
+- [ ] Option zum Vermeiden kommutativ identischer Aufgaben
+- [ ] Zeitbedarf-Schätzungen als Option einstellbar
 
 ## Lizenz
 
@@ -183,7 +183,7 @@ Teile benutzen jeweils eigene Lizenzen:
 
 ## KI-Transparenzhinweis
 
-Adsumudi ist mit Unterstützung durch KI-generierten Code und Tests entstanden. Anforderungen, Entwurf, Prüfung und Anpassungen sowie Commits liegen sämtlich beim Autor.
+Adsumudi ist mit Unterstützung durch KI (Teile des Codes und Tests) entstanden. Anforderungen, Entwurf, Prüfung und Überarbeitung des Codes sowie Commits stammen vom menschlichen Urheber.
 
 [Typst]: https://typst.app
 [LaTeX]: https://www.latex-project.org/
