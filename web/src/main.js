@@ -67,8 +67,10 @@ let typstReady = false;
 
 engine.luaReady
   .then(async ({ ms }) => {
+    const def = await engine.defaults();
+    form.fill(def);
+    diagnostics.log(`(Adsumudi ${def.version})`);
     diagnostics.log(`Rechenkern (Lua) bereit nach ${ms} ms`);
-    form.fill(await engine.defaults());
     $("form-fields").disabled = false;
     if (!typstReady) {
       setStatus("Lade Satzsystem … (beim ersten Besuch einige Sekunden)");
