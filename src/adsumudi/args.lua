@@ -46,6 +46,7 @@ Optionen:
       --titel TEXT      Überschrift (Standard: Rechenblatt)
   -d, --debug           Layout-Debugging: Boxen sichtbar machen
                         (latex: lua-visual-debug, .log-Datei behalten)
+  -v, --version         Versionsnummer anzeigen
   -h, --hilfe           diese Hilfe anzeigen
 
 Beispiele:
@@ -120,7 +121,7 @@ end
 --- Parses the arguments.
 --  **Throws error:** unknown or malformed option, or a conflict with --blattcode.
 --- @param args string[]
---- @return { settings: Settings, output: string?, backend: string?, source_only: boolean, title: string, solutions: boolean, debug: boolean, help: boolean? }
+--- @return { settings: Settings, output: string?, backend: string?, source_only: boolean, title: string, solutions: boolean, debug: boolean, version: boolean?, help: boolean? }
 function M.parse(args)
 	local o = {}
 	for key, v in pairs(M.DEFAULTS) do
@@ -148,6 +149,8 @@ function M.parse(args)
 		local a = args[i]
 		if a == "-h" or a == "--hilfe" or a == "--help" then
 			o.help = true
+		elseif a == "-v" or a == "--version" then
+			o.version = true
 		elseif a == "-c" or a == "--blattcode" then
 			settings.code = value(a)
 		elseif a == "-n" or a == "--anzahl" then

@@ -1,12 +1,12 @@
 -- typst.lua
--- Typst backend (default): serializes the template view (view.lua) to JSON,
--- which templates/adsumudi.typ reads via `sys.inputs`.
+-- Typst backend: serializes the template view (view.lua) to JSON, which
+-- templates/adsumudi.typ reads via `sys.inputs`.
 
 --- Options for building the PDF.
 --- @class BuildOptions
---- @field keep_files boolean? keep intermediate files (debug mode; LaTeX only)
+--- @field keep_files boolean? keep intermediate files (debug mode)
 
---- Interface of a rendering backend (typst.lua, latex.lua).
+--- Interface of a rendering backend.
 --- @class Backend
 --- @field SOURCE_EXT string source file extension
 --- @field render     fun(sheet: SheetData, presentation: Presentation?): string
@@ -64,23 +64,21 @@ local KEY_ORDER = {
 --- @return string JSON
 function M.render(sheet, presentation)
 	local data = view.build(sheet, presentation) --[[@as TypstData]]
-	-- Explicit null instead of a missing key, so the template can rely on
-	-- every field being present.
+	-- explicit null instead of a missing key
+	-- (template can make sure that every field is present)
 	data.blattcode = data.blattcode or json.null
 	data.minuten = data.minuten or json.null
 	return json.encode(data, { indent = true, keyorder = KEY_ORDER }) .. "\n"
 end
 
---- Compiles the PDF with the typst CLI.
---  Only the bundled fonts are used (--ignore-system-fonts), so the result is
---  the same on every machine.
+--- Compiles PDF with the typst CLI.
 --  **Throws error:** the shell cannot be started.
 --- @param source   string JSON from M.render
 --- @param pdf_path string path of the PDF to create
---- @return string|nil, string? pdf_path on success; else nil and a message with typst's output
+--- @return string|nil, string? pdf_path on success; nil and typst output otherwise
 function M.build(source, pdf_path)
 	local cmd = table.concat({
-		"typst compile --ignore-system-fonts",
+		"typst compile --ignore-system-fonts", -- make sure our bundled fonts are used
 		"--font-path " .. shell.quote(M.FONT_DIR),
 		"--input " .. shell.quote("daten=" .. source),
 		shell.quote(M.TEMPLATE_PATH),
@@ -94,9 +92,7 @@ function M.build(source, pdf_path)
 		return pdf_path
 	end
 	if code == 127 then
-		return nil,
-			"typst wurde nicht gefunden. Installation z.B. mit: cargo install --locked typst-cli "
-				.. "(oder --satz latex verwenden)"
+		return nil, "typst nicht gefunden (installieren mit `cargo install --locked typst-cli`)"
 	end
 	return nil, "typst ist fehlgeschlagen:\n" .. output
 end

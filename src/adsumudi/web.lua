@@ -37,6 +37,7 @@ local json = require("dkjson.dkjson")
 local sheet = require("adsumudi.sheet")
 local typst = require("adsumudi.typst")
 local view = require("adsumudi.view")
+local version = require("adsumudi.version")
 
 local M = {}
 
@@ -148,7 +149,7 @@ local function object(value, label)
 end
 
 --- Settings the form starts with: the domain defaults plus the default title.
---  Response: JSON {operations, min, max, minutes, title}.
+--  Response: JSON {operations, min, max, minutes, title, version}.
 --- @return string JSON
 function M.defaults()
 	local d = sheet.DEFAULTS
@@ -158,6 +159,7 @@ function M.defaults()
 		max = d.max,
 		minutes = d.minutes,
 		title = M.DEFAULT_TITLE,
+		version = version.VERSION,
 	})
 end
 
@@ -165,7 +167,7 @@ end
 --  **Throws error:** invalid request, or the sheet cannot be generated.
 --- @param request_json string
 --- @return WebResult
-local function generate(request_json)
+local function do_generate(request_json)
 	local request, _, err = json.decode(request_json)
 	-- dkjson marks decoded arrays with __jsontype = "array"; only objects are valid.
 	if type(request) ~= "table" or (getmetatable(request) or {}).__jsontype == "array" then
@@ -206,7 +208,7 @@ local function generate(request_json)
 		count = result.count,
 		description = view.describe(result.operations, result.min, result.max),
 		title = title,
-		source = typst.render(result, { title = title, solutions = p.solutions == true }),
+		source = typst.render(result, { title = title, solutions = p.solutions == true, version = p.version }),
 	}
 end
 
@@ -217,7 +219,7 @@ end
 --- @param request_json string JSON
 --- @return string JSON
 function M.generate(request_json)
-	local ok, result = pcall(generate, request_json)
+	local ok, result = pcall(do_generate, request_json)
 	if not ok then
 		return encode({ ok = false, error = tostring(result) })
 	end
