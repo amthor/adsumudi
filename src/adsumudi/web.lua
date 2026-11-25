@@ -208,7 +208,7 @@ local function do_generate(request_json)
 		count = result.count,
 		description = view.describe(result.operations, result.min, result.max),
 		title = title,
-		source = typst.render(result, { title = title, solutions = p.solutions == true, version = p.version }),
+		source = typst.render(result, { title = title, solutions = p.solutions == true }),
 	}
 end
 
