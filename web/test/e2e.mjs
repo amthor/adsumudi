@@ -189,6 +189,19 @@ try {
       JSON.stringify({ operations: ["add", "sub"], min: "1", max: "100", minutes: "5", title: "Rechenblatt" }),
     JSON.stringify(defaults),
   );
+  // The version comes from the Lua core as well; the CLI must report the same.
+  let cliVersion = "";
+  try {
+    cliVersion = execFileSync("lua", ["adsumudi.lua", "--version"], { cwd: root, encoding: "utf8" }).trim();
+  } catch {
+    // stays "": the check below fails with a hint
+  }
+  const versionLog = await page.$eval("#diagnostics-log", (e) => e.textContent);
+  check(
+    `Version in „Technische Details“ wie in der CLI (${cliVersion || "lua adsumudi.lua --version schlug fehl"})`,
+    cliVersion !== "" && versionLog.includes(cliVersion),
+    versionLog,
+  );
   check("Verlauf anfangs ausgeblendet", await page.$eval("#history", (e) => e.hidden));
   check("Technische Details anfangs zugeklappt", await page.$eval("#diagnostics", (e) => !e.open));
 
