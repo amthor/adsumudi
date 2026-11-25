@@ -1,5 +1,6 @@
 local cli = require("adsumudi.cli")
 local json = require("dkjson.dkjson")
+local version = require("adsumudi.version")
 
 -- In-memory stream that collects everything written to it.
 local function stream()
@@ -27,6 +28,14 @@ describe("cli.main", function()
 		local out, err = stream(), stream()
 		assert.are.equal(0, cli.main({ "--hilfe" }, out, err))
 		assert.truthy(out.text:find("Aufruf:", 1, true))
+		assert.matches("Adsumudi " .. version.VERSION, out.text, 1, true)
+		assert.are.equal("", err.text)
+	end)
+
+	it("--version gibt Name und Version aus und liefert 0", function()
+		local out, err = stream(), stream()
+		assert.are.equal(0, cli.main({ "--version" }, out, err))
+		assert.are.equal("Adsumudi " .. version.VERSION .. "\n", out.text)
 		assert.are.equal("", err.text)
 	end)
 

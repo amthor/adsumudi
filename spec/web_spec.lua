@@ -1,6 +1,7 @@
 local json = require("dkjson.dkjson")
 local sheet = require("adsumudi.sheet")
 local typst = require("adsumudi.typst")
+local version = require("adsumudi.version")
 local web = require("adsumudi.web")
 
 -- Calls web.generate like the browser does: table -> JSON -> Lua -> JSON -> table.
@@ -10,13 +11,14 @@ local function generate(request)
 end
 
 describe("web.defaults", function()
-	it("liefert die Voreinstellungen des Kerns und den Standardtitel", function()
+	it("liefert die Voreinstellungen des Kerns, den Standardtitel und die Version", function()
 		assert.are.same({
 			operations = { "add", "sub" },
 			min = 1,
 			max = 100,
 			minutes = 5,
 			title = "Rechenblatt",
+			version = version.VERSION,
 		}, json.decode(web.defaults()))
 	end)
 end)

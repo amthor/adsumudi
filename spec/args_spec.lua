@@ -13,6 +13,11 @@ describe("args.parse", function()
 		assert.is_nil(o.help)
 	end)
 
+	it("--version fordert die Versionsausgabe an", function()
+		assert.is_true(args.parse({ "--version" }).version)
+		assert.is_nil(args.parse({}).version)
+	end)
+
 	it("--satz wählt das Satzsystem, --quelle nur die Quelle", function()
 		assert.are.equal("latex", args.parse({ "--satz", "latex" }).backend)
 		assert.are.equal("typst", args.parse({ "--satz", "Typst" }).backend)
