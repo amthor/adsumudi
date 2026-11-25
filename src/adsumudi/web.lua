@@ -1,5 +1,5 @@
 -- web.lua
--- Web frontend adapter: JSON request -> sheet -> Typst data, JSON response.
+-- Web GUI frontend (JSON request -> sheet -> Typst data, JSON response).
 --
 -- Counterpart of cli.lua for the browser GUI in web/. The page talks to Lua
 -- through exactly one JSON string in each direction. That keeps Wasmoon's
@@ -24,14 +24,14 @@
 --- @field title     any expected: string
 --- @field solutions any expected: boolean
 
---- Successful response, before JSON encoding.
+--- Successful response before JSON encoding.
 --- @class WebResult
 --- @field ok          true
 --- @field code        string
 --- @field count       integer
 --- @field description string
 --- @field title       string
---- @field source      string data for templates/adsumudi.typ (sys.inputs.daten)
+--- @field source      string data for templates/adsumudi.typ (`sys.inputs.daten`)
 
 local json = require("dkjson.dkjson")
 local sheet = require("adsumudi.sheet")
@@ -44,7 +44,8 @@ local M = {}
 --- @type string
 M.DEFAULT_TITLE = "Rechenblatt"
 
---- Stable key order for responses (dkjson otherwise follows pairs()).
+--- Stable key order for responses (dkjson should not use an arbitrary order
+--  following from `pairs()`).
 --- @type string[]
 local KEY_ORDER = {
 	"ok",
@@ -67,7 +68,9 @@ local function encode(value)
 	return json.encode(value, { keyorder = KEY_ORDER }) --[[@as string]]
 end
 
--- Input checks. Names in messages are the German field labels of the form.
+-- === Input checks ===
+--
+-- Names in messages are (German) field labels in the form
 
 --- Checks an optional integer.
 --  **Throws error:** not an integer.
