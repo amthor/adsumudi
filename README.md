@@ -160,20 +160,18 @@ Funktionen:
 - Aufklappbare Konsole mit Fehlermeldungen und Angaben zu Datenvolumen, Lade-
   und Erzeugungszeiten
 
-`web/dist/` ist die komplette Website. Sie enthält Kopien von Lua-Code,
-Template und Schriften aus diesem Repository (Neubau nach Änderungen per CI).
-Der erste Aufruf lädt rund 30 MB (vor allem der Typst-Compiler; komprimiert
-ausgeliefert etwa 10 MB), danach kommt alles aus dem Browser-Cache.
+`web/dist/` enthält Kopien des Lua-Codes, Template und Schriften aus dem
+Repository. Initial sind ca. 30 MB zu laden (vorwiegend Typst-Compiler), danach
+alles aus dem Browser-Cache.
 
-### Veröffentlichung
+## Geplante Erweiterungen
 
-Jeder Push auf `main` baut die Seite neu und veröffentlicht sie auf GitHub
-Pages via Github workflow. Den Zustand nach dem Deployment prüft der e2e-Test
-gegen die veröffentlichte Seite:
-
-```sh
-cd web && E2E_URL=https://amthor.github.io/adsumudi/ npm test
-```
+- Division mit Rest ermöglichen
+- negative Zahlenraumgrenzen erlauben
+- Option für Lücken auch für Operanden, nicht nur für das Ergebnis
+- Option für Zehnerübergang
+- Option für Ergebnisse auch außerhalb des Zahlenraums
+- Option zum Vermeiden kommutativ identischer Aufgaben
 
 ## Lizenz
 
