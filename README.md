@@ -7,18 +7,15 @@
 
 Adsumudi erzeugt Mathe-Übungsblätter (Grundschule) zum selbständigen Üben als
 PDF, gesetzt mit [Typst] ([LaTeX] möglich als alternatives Backend). Verfügbar
-als Kommandozeilenprogramm oder [Web-Oberfläche](#web-oberfläche) (vollständig
-im Browser):
+als Kommandozeilenprogramm oder [im Browser](#web-oberfläche):
 
 <https://amthor.github.io/adsumudi/>
 
 ## Voraussetzungen
 
 - Lua ≥ 5.3
-- für Lua-Tests (optional): [busted](https://lunarmodules.github.io/busted/)
 - [Typst](https://github.com/typst/typst), via `cargo install --locked
 typst-cli`
-- Fonts im Repo: Fira Sans, SIL Open Font License (`fonts/`)
 - [dkjson](http://dkolf.de/dkjson-lua/) im Repo (`dkjson/`)
 - für das LaTeX backend (`--satz latex`):
   - Template-Engine [etlua] via `luarocks install --local etlua`
@@ -38,25 +35,25 @@ lua adsumudi.lua --satz latex  # wie oben, mit LateX backend
 lua adsumudi.lua --hilfe  # Hilfe zu Optionen (s.u.)
 ```
 
-| Option                   | Bedeutung                                                                                       | Standard          |
-| ------------------------ | ----------------------------------------------------------------------------------------------- | ----------------- |
-| `-n`, `--anzahl N`       | Anzahl Aufgaben (Vorrang vor `--minuten`)                                                       | –                 |
-| `-t`, `--minuten M`      | Bearbeitungsdauer (automatische Bestimmund der Anzahl Aufgaben)                                 | 5                 |
-| `--min N`, `--max N`     | Zahlenraum                                                                                      | 1, 100            |
-| `-r`, `--rechenarten`    | `add,sub,mul,div` oder `+,-,*,:`                                                                | `add,sub`         |
-| `-l`, `--loesungen`      | Lösungsblatt als zweite Seite generieren                                                        | aus               |
-| `-o`, `--ausgabe`        | Ausgabedatei                                                                                    | `rechenblatt.pdf` |
-| `--satz SYSTEM`          | `typst` oder `latex`                                                                            | `typst`           |
-| `--quelle`               | kein PDF ausgeben sondern nur dessen Quelldatei schreiben (`.json` bei Typst, `.tex` bei LaTeX) | aus               |
-| `-c`, `--blattcode CODE` | vorheriges Blatt aus Blattcode nachbauen (siehe unten)                                          | –                 |
-| `-s`, `--seed N`         | Zufallsstartwert des Aufgabengenerators                                                         | Uhrzeit           |
-| `-d`, `--debug`          | alle Textboxen im PDF sichtbar machen (bei LaTeX wird `.tex` und `.log` behalten)               | aus               |
+| Option                   | Bedeutung                                                                               | Standard          |
+| ------------------------ | --------------------------------------------------------------------------------------- | ----------------- |
+| `-n`, `--anzahl N`       | Anzahl Aufgaben (Vorrang vor `--minuten`)                                               | –                 |
+| `-t`, `--minuten M`      | Bearbeitungsdauer (automatische Bestimmund der Anzahl Aufgaben)                         | 5                 |
+| `--min N`, `--max N`     | Zahlenraum                                                                              | 1, 100            |
+| `-r`, `--rechenarten`    | `add,sub,mul,div` oder `+,-,*,:`                                                        | `add,sub`         |
+| `-l`, `--loesungen`      | Lösungsblatt als zweite Seite generieren                                                | aus               |
+| `-o`, `--ausgabe`        | Ausgabedatei                                                                            | `rechenblatt.pdf` |
+| `--satz SYSTEM`          | `typst` oder `latex`                                                                    | `typst`           |
+| `--quelle`               | kein PDF ausgeben, stattdessen nur Quelldatei schreiben (Typst: `.json`, LaTeX: `.tex`) | aus               |
+| `-c`, `--blattcode CODE` | Blatt aus gegebenem Blattcode reproduzieren (s.u.)                                      | –                 |
+| `-s`, `--seed N`         | Zufallsstartwert des Aufgabengenerators                                                 | akt. Uhrzeit      |
+| `-d`, `--debug`          | alle Textboxen im PDF sichtbar machen (LaTeX: `.tex`, `.log` nicht löschen)             | aus               |
 
 ### Blatt nachdrucken
 
 Unten rechts auf der ersten Seite steht ein _Blattcode_ (z. B.
 `1-AS-1-100-22-48213`), der auch nach dem Erzeugen auf der Konsole bzw.
-Webseite angegeben wird. Mit ihm lässt sich das Blatt später exakt nachbauen,
+Webseite angegeben wird. Mit ihm lässt sich ein Blatt später exakt nachbauen,
 etwa Aufaben zu wiederholen um nachträglich Lösungen zu drucken:
 
 ```sh
@@ -74,7 +71,7 @@ Aufbau des Blattcodes: `(Version)-(Rechenarten)-(Min)-(Max)-(Anzahl)-(Seed)`.
   mit ihrer früheren Programmversion nicht mehr verwendet werden und werden
   abgelehnt.
 
-Der Code legt die Aufgaben fest, darüber hinaus können wie gewohnt `--titel`,
+Der Code legt nur die Aufgaben fest, darüber hinaus können wie gewohnt `--titel`,
 `-l`, `-o`, `--satz` und `--quelle` frei kombiniert werden. Die Optionen `-r`,
 `--min`, `--max`, `-n`, `-t` und `-s` sind bei Angabe eines Blattcodes nicht
 möglich.
@@ -87,7 +84,7 @@ Der Aufgabengenerator folgt folgenden Regeln:
 
 - Alle Zahlen in den Aufgaben müssen im Zahlenbereich liegen, die Ergebnisse
   zwischen 0 und `--max`.
-- Keine negativen Ergebnisse, Division immer ohne Rest.
+- Keine negativen Ergebnisse, Division ohne Rest.
 - Bei Mal und Geteilt kommen die Faktoren 0 und 1 nicht vor, wenn der Bereich
   das zulässt.
 - Rechenarten werden gleichmäßig verteilt und gemischt, doppelte Aufgaben
@@ -103,13 +100,13 @@ Durchschnittschätzungen je Rechenart wie folgt angenommen:
 - Mal: 15 s (Einmaleins muss auswendig sitzen)
 - Geteilt: 20 s
 
-Diese Werte können bei Bedarf angepasst werden, je nach individuellem Tempo der
-Schüler\*innen.
+Diese Werte müssen bei Bedarf direkt im Code angepasst werden, bei abweichendem
+Tempo der Schülerinnen und Schüler.
 
 ### Layout
 
 **Typst-Backend:** Das Aussehen des Blatts steht vollständig in
-`templates/adsumudi.typ`. Lua liefert nur die generierten Aufgabendaten als
+`templates/adsumudi.typ`. Der Lua-Kern liefert hierfür die Aufgabendaten als
 JSON. Ohne Daten zeigt das Template ein Demoblatt mit Daten aus
 `templates/beispiel.json`, welches sich gut eignet, um das Layout mit
 Live-Vorschau zu modifizieren:
@@ -172,6 +169,7 @@ alles aus dem Browser-Cache.
 - Option für Zehnerübergang
 - Option für Ergebnisse auch außerhalb des Zahlenraums
 - Option zum Vermeiden kommutativ identischer Aufgaben
+- Zeitbedarf-Schätzungen als Option einstellbar
 
 ## Lizenz
 
