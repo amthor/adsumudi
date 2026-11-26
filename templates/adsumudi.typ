@@ -44,7 +44,7 @@
 //
 #set document(
   title: daten.titel,
-  author: daten.metadaten.name,
+  author: daten.metadaten.autor,
   description: daten.metadaten.betreff,
 )
 
@@ -70,7 +70,7 @@
     if here().page() == 1 {
       text(
         size: 8pt,
-      )[Erstellt mit _Adsumudi_ #daten.metadaten.version \ #underline([#link(daten.metadaten.benutzerwebseite.url)[#daten.metadaten.benutzerwebseite.text]])]
+      )[Erstellt mit #emph(daten.metadaten.name) #daten.metadaten.version \ #underline([#link(daten.metadaten.benutzerwebseite.url)[#daten.metadaten.benutzerwebseite.text]])]
     },
     counter(page).display("1 / 1", both: true),
     align(right, if here().page() == 1 and daten.blattcode != none {
