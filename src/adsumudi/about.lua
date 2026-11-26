@@ -8,18 +8,20 @@
 
 --- Program metadata package.
 --- @class about
---- @field name        string full program name
+--- @field name        string program name
 --- @field version     string program version
---- @field description string short description
---- @field author      string human name
---- @field createdby   string declaration of source
+--- @field description string short program description
+--- @field developer   string developer name
 --- @field urlproject  url    repository URL
 --- @field urlweb      url    web app URL
---- @field terms       string usage terms and conditions
+--- @field pdfsubject  string "subject" meta of generated sheet
+--- @field pdfauthor   string "author" meta of a generated sheet
+--- @field pdfcreator  string "creator" meta of a generated sheet
+--- @field usageterms  string usage terms of a generated sheet
 
---- Full program name.
+--- Program name.
 --- @type string
-local NAME = "Adsumudi Rechenblattgenerator"
+local NAME = "Adsumudi"
 
 --- Program version.
 --  Adsumudi uses SemVer: major revisions (first digit) are only such that break
@@ -27,9 +29,13 @@ local NAME = "Adsumudi Rechenblattgenerator"
 --- @type string
 local VERSION = "1.1.0"
 
---- Program author.
+--- Program description.
 --- @type string
-local AUTHOR = "Peter Amthor"
+local DESCRIPTION = "Adsumudi Rechenblattgenerator"
+
+--- Human program developer.
+--- @type string
+local DEVELOPER = "Peter Amthor"
 
 --- GitHub project URL.
 --- @type url
@@ -45,18 +51,20 @@ local CREATEDBY = "Erstellt mit Adsumudi " .. VERSION .. " (" .. URLPROJECT.full
 
 --- Sheet usage terms and conditions.
 --- @type string
-local TERMS = "Dieses Blatt ist gemeinfrei (CC0 1.0) und darf ohne Einschränkung verwendet werden."
+local USAGETERMS = "Dieses Blatt ist gemeinfrei (CC0 1.0) und darf ohne Einschränkung verwendet werden."
 
 --- Full metadata.
 --- @type about
 local M = {
     name = NAME,
     version = VERSION,
-    description = CREATEDBY .. ". \n" .. TERMS,
-    author = AUTHOR,
-    createdby = CREATEDBY,
+    description = DESCRIPTION,
+    developer = DEVELOPER,
     urlproject = URLPROJECT,
     urlweb = URLWEB,
-    terms = TERMS,
+    pdfsubject = CREATEDBY .. ". " .. USAGETERMS,
+    pdfauthor = DESCRIPTION, -- reusing the short description,
+    pdfcreator = DESCRIPTION, -- reusing the short description
+    usageterms = USAGETERMS,
 }
 return M
