@@ -6,7 +6,7 @@
 
 local args = require("adsumudi.args")
 local sheet = require("adsumudi.sheet")
-local version = require("adsumudi.version")
+local about = require("adsumudi.about")
 
 local M = {}
 
@@ -40,12 +40,12 @@ function M.main(argv, out, errout)
 	end
 
 	if opts.version then
-		out:write("Adsumudi " .. version.VERSION .. "\n")
+		out:write("Adsumudi " .. about.version .. "\n")
 		return 0
 	end
 
 	if opts.help then
-		out:write("Adsumudi " .. version.VERSION .. "\n" .. args.HELP)
+		out:write("Adsumudi " .. about.version .. "\n" .. args.HELP)
 		return 0
 	end
 

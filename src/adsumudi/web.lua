@@ -37,7 +37,7 @@ local json = require("dkjson.dkjson")
 local sheet = require("adsumudi.sheet")
 local typst = require("adsumudi.typst")
 local view = require("adsumudi.view")
-local version = require("adsumudi.version")
+local about = require("adsumudi.about")
 
 local M = {}
 
@@ -159,7 +159,7 @@ function M.defaults()
 		max = d.max,
 		minutes = d.minutes,
 		title = M.DEFAULT_TITLE,
-		version = version.VERSION,
+		version = about.version,
 	})
 end
 

@@ -112,7 +112,7 @@ function M.build(sheet, presentation)
         metadaten = {
             name = about.name,
             version = about.version,
-            betreff = about.description,
+            betreff = about.pdfsubject,
             autor = about.pdfauthor,
             ersteller = about.pdfcreator,
             entwicklerwebseite = { url = about.urlproject.full, text = about.urlproject.display },
