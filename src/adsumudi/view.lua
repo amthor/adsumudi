@@ -22,7 +22,7 @@
 --- @field b        number
 --- @field ergebnis number
 
---- Template view (field names are German template variables).
+--- Template view (German variable names).
 --- @class View
 --- @field titel        string       page title
 --- @field seiten       ViewPage[]   sheet plus solution if requested
@@ -32,16 +32,30 @@
 --- @field minuten      string?      display string such as "5" or "7.5"
 --- @field stellen      integer      max. number of digits in number range
 --- @field debug        boolean      layout debugging requested
+--- @field metadaten    ViewMeta     metadata
+
+--- Metadata field of template view (German variable names).
+--- @class ViewMeta
+--- @field name                string program name
+--- @field version             string program version
+--- @field betreff             string PDF "subject" field
+--- @field autor               string PDF "author" field
+--- @field ersteller           string PDF "creator" field
+--- @field entwicklerwebseite  url    repository URL
+--- @field benutzerwebseite    url    web app URL
+--- @field nutzungsbedingungen string usage terms of a generated sheet
+
+local about = require("adsumudi.about")
 
 local M = {}
 
 --- German operation names.
 --- @type { [Operation]: string }
 local OPERATION_NAMES = {
-	add = "Plus",
-	sub = "Minus",
-	mul = "Mal",
-	div = "Geteilt",
+    add = "Plus",
+    sub = "Minus",
+    mul = "Mal",
+    div = "Geteilt",
 }
 
 --- Maximum number of digits in the number range.
@@ -51,7 +65,7 @@ local OPERATION_NAMES = {
 --- @param max number
 --- @return integer
 function M.digit_count(min, max)
-	return math.max(#tostring(math.floor(min)), #tostring(math.floor(max)))
+    return math.max(#tostring(math.floor(min)), #tostring(math.floor(max)))
 end
 
 --- Short German description of a sheet.
@@ -62,12 +76,12 @@ end
 --- @param max        integer
 --- @return string
 function M.describe(operations, min, max)
-	--- @type string[]
-	local names = {}
-	for _, op in ipairs(operations) do
-		names[#names + 1] = OPERATION_NAMES[op]
-	end
-	return ("%s im Zahlenraum %d bis %d"):format(table.concat(names, ", "), min, max)
+    --- @type string[]
+    local names = {}
+    for _, op in ipairs(operations) do
+        names[#names + 1] = OPERATION_NAMES[op]
+    end
+    return ("%s im Zahlenraum %d bis %d"):format(table.concat(names, ", "), min, max)
 end
 
 --- Builds the template view.
@@ -75,27 +89,37 @@ end
 --- @param presentation Presentation?
 --- @return View
 function M.build(sheet, presentation)
-	presentation = presentation or {}
-	--- @type ViewPage[]
-	local pages = { { loesung = false } }
-	if presentation.solutions then
-		pages[2] = { loesung = true }
-	end
-	--- @type ViewTask[]
-	local tasks = {}
-	for i, task in ipairs(sheet.tasks) do
-		tasks[i] = { art = task.op, a = task.a, b = task.b, ergebnis = task.result }
-	end
-	return {
-		titel = presentation.title or "Rechenblatt",
-		seiten = pages,
-		aufgaben = tasks,
-		blattcode = sheet.code,
-		beschreibung = M.describe(sheet.operations, sheet.min, sheet.max),
-		minuten = sheet.minutes and (tostring(sheet.minutes):gsub("%.0$", "")),
-		stellen = M.digit_count(sheet.min, sheet.max),
-		debug = presentation.debug or false,
-	}
+    presentation = presentation or {}
+    --- @type ViewPage[]
+    local pages = { { loesung = false } }
+    if presentation.solutions then
+        pages[2] = { loesung = true }
+    end
+    --- @type ViewTask[]
+    local tasks = {}
+    for i, task in ipairs(sheet.tasks) do
+        tasks[i] = { art = task.op, a = task.a, b = task.b, ergebnis = task.result }
+    end
+    return {
+        titel = presentation.title or "Rechenblatt",
+        seiten = pages,
+        aufgaben = tasks,
+        blattcode = sheet.code,
+        beschreibung = M.describe(sheet.operations, sheet.min, sheet.max),
+        minuten = sheet.minutes and (tostring(sheet.minutes):gsub("%.0$", "")),
+        stellen = M.digit_count(sheet.min, sheet.max),
+        debug = presentation.debug or false,
+        metadaten = {
+            name = about.name,
+            version = about.version,
+            betreff = about.description,
+            autor = about.pdfauthor,
+            ersteller = about.pdfcreator,
+            entwicklerwebseite = { url = about.urlproject.full, text = about.urlproject.display },
+            benutzerwebseite = { url = about.urlweb.full, text = about.urlweb.display },
+            nutzungsbedingungen = about.usageterms,
+        }
+    }
 end
 
 return M
