@@ -1,6 +1,6 @@
 local cli = require("adsumudi.cli")
 local json = require("dkjson.dkjson")
-local version = require("adsumudi.version")
+local about = require("adsumudi.about")
 
 -- In-memory stream that collects everything written to it.
 local function stream()
@@ -28,14 +28,14 @@ describe("cli.main", function()
 		local out, err = stream(), stream()
 		assert.are.equal(0, cli.main({ "--hilfe" }, out, err))
 		assert.truthy(out.text:find("Aufruf:", 1, true))
-		assert.matches("Adsumudi " .. version.VERSION, out.text, 1, true)
+		assert.matches("Adsumudi " .. about.version, out.text, 1, true)
 		assert.are.equal("", err.text)
 	end)
 
 	it("--version gibt Name und Version aus und liefert 0", function()
 		local out, err = stream(), stream()
 		assert.are.equal(0, cli.main({ "--version" }, out, err))
-		assert.are.equal("Adsumudi " .. version.VERSION .. "\n", out.text)
+		assert.are.equal("Adsumudi " .. about.version .. "\n", out.text)
 		assert.are.equal("", err.text)
 	end)
 
@@ -66,6 +66,31 @@ describe("cli.main", function()
 		assert.truthy(out.text:find("Quelle geschrieben (6 Aufgaben): " .. path, 1, true))
 		assert.truthy(out.text:find("Blattcode: 1-AS-1-100-6-12345", 1, true))
 		assert.are.equal("", err.text)
+	end)
+
+	it("templates/beispiel.json ist aktuell", function()
+		local path = os.tmpname()
+		local code = cli.main({ "-t", "5", "-s", "4711", "-l", "--quelle", "-o", path }, stream(), stream())
+		local fresh = read_file(path)
+		os.remove(path)
+		assert.are.equal(0, code)
+		-- If this fails: lua adsumudi.lua -t 5 -s 4711 -l --quelle -o templates/beispiel.json
+		assert.are.equal(read_file("templates/beispiel.json"), fresh)
+	end)
+
+	it("--quelle schreibt in jedem Prozess dieselbe JSON (feste Schlüsselreihenfolge)", function()
+		-- Lua 5.4 seeds its string hashes per process, so pairs() order (and
+		-- with it every key missing from typst.lua's KEY_ORDER) changes between runs.
+		local outputs = {}
+		for i = 1, 3 do
+			local path = os.tmpname()
+			local cmd = "lua adsumudi.lua -c 1-AS-1-100-6-12345 -l --quelle -o " .. path .. " > /dev/null"
+			assert.is_true(os.execute(cmd) == true)
+			outputs[i] = read_file(path)
+			os.remove(path)
+		end
+		assert.are.equal(outputs[1], outputs[2])
+		assert.are.equal(outputs[1], outputs[3])
 	end)
 
 	it("--quelle schreibt bei LaTeX das .tex-Dokument", function()

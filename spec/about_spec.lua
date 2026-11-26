@@ -1,8 +1,8 @@
-local version = require("adsumudi.version")
+local about = require("adsumudi.about")
 
-describe("version.VERSION", function()
+describe("about.version", function()
 	it("ist eine SemVer-Versionsnummer", function()
-		local v = version.VERSION
+		local v = about.version
 		assert.is_string(v)
 		-- MAJOR.MINOR.PATCH, optionally followed by a pre-release such as -rc.1
 		assert.matches("^%d+%.%d+%.%d+", v)

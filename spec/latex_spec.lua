@@ -65,6 +65,22 @@ describe("latex.render", function()
 		assert.truthy(tex:find("\\thispagestyle{ersteseite}", 1, true))
 	end)
 
+	it("setzt die Fußzeile links einmal, mit Link auf die Webseite", function()
+		-- "Erstellt mit" also appears in pdfsubject; that the footer is only on
+		-- page 1 is checked on the PDF (spec/pdf_spec.lua).
+		local tex = latex.render(with(sheet, { code = "1-AS-1-100-22-4711" }), { solutions = true })
+		local _, n = tex:gsub("\\lfoot{", "")
+		assert.are.equal(1, n)
+		assert.matches("\\href{https://amthor.github.io/adsumudi/}", tex, 1, true)
+	end)
+
+	it("setzt die PDF-Metadaten mit hyperref", function()
+		local tex = latex.render(sheet)
+		assert.matches("\\usepackage[^\n]*{hyperref}", tex)
+		assert.matches("\\hypersetup{", tex, 1, true)
+		assert.matches("Adsumudi Rechenblattgenerator", tex, 1, true)
+	end)
+
 	it("lässt den Blattcode ohne Code weg", function()
 		local tex = latex.render(sheet)
 		assert.falsy(tex:find("Blattcode:", 1, true))

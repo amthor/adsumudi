@@ -1,5 +1,7 @@
 local json = require("dkjson.dkjson")
 local typst = require("adsumudi.typst")
+local about = require("adsumudi.about")
+local view = require("adsumudi.view")
 
 describe("typst.render", function()
 	local sheet = {
@@ -31,6 +33,12 @@ describe("typst.render", function()
 		assert.are.same({ { loesung = false } }, data.seiten)
 		assert.are.same({ art = "add", a = 12, b = 7, ergebnis = 19 }, data.aufgaben[1])
 		assert.are.same({ art = "mul", a = 3, b = 4, ergebnis = 12 }, data.aufgaben[2])
+	end)
+
+	it("übergibt die Metadaten der View", function()
+		local data = decode(typst.render(sheet))
+		assert.are.same(view.build(sheet).metadaten, data.metadaten)
+		assert.are.equal(about.version, data.metadaten.version)
 	end)
 
 	it("übernimmt Titel, Lösungsseite und Debug", function()
