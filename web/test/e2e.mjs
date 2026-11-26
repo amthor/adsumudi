@@ -66,6 +66,14 @@ function startServer() {
   return new Promise((resolve) => server.listen(0, "127.0.0.1", () => resolve(server)));
 }
 
+// Title, Author and Subject as one comparable string.
+function pdfMeta(pdf) {
+  const info = execFileSync("pdfinfo", [pdf], { encoding: "utf8" });
+  return ["Title", "Author", "Subject"]
+    .map((key) => `${key}: ${info.match(new RegExp(`^${key}:\\s*(.*)$`, "m"))?.[1] ?? ""}`)
+    .join(" | ");
+}
+
 const bbox = (pdf) =>
   execFileSync("pdftotext", ["-bbox", pdf, "-"], { encoding: "utf8" }).replace(/<head>[\s\S]*?<\/head>/, "");
 
@@ -202,6 +210,12 @@ try {
     cliVersion !== "" && versionLog.includes(cliVersion),
     versionLog,
   );
+  // Icon link to the repository in the masthead, with a name for screen readers.
+  const github = await page.evaluate(() => {
+    const link = document.querySelector('.masthead a[href^="https://github.com/amthor/adsumudi"]');
+    return link && { name: (link.getAttribute("aria-label") ?? link.textContent).trim(), icon: !!link.querySelector("svg") };
+  });
+  check("GitHub-Link im Masthead (Icon mit Namen)", !!github?.icon && github.name !== "", JSON.stringify(github));
   check("Verlauf anfangs ausgeblendet", await page.$eval("#history", (e) => e.hidden));
   check("Technische Details anfangs zugeklappt", await page.$eval("#diagnostics", (e) => !e.open));
 
@@ -219,10 +233,13 @@ try {
     await setForm(page, { code: c.code, solutions: c.solutions, title: c.title });
     const result = await generate(page);
     const web = await downloadPdf(page, join(tmp, `web-${c.code}.pdf`));
+    const cli = cliPdf(tmp, c.code, c);
+    const name = `${c.code}${c.solutions ? " mit Lösungen" : ""}${c.title ? " und eigenem Titel" : ""}`;
+    check(`${name}: PDF wie im CLI`, result.code === c.code && bbox(web) === bbox(cli), JSON.stringify(result));
     check(
-      `${c.code}${c.solutions ? " mit Lösungen" : ""}${c.title ? " und eigenem Titel" : ""}: PDF wie im CLI`,
-      result.code === c.code && bbox(web) === bbox(cliPdf(tmp, c.code, c)),
-      JSON.stringify(result),
+      `${name}: Metadaten wie im CLI`,
+      pdfMeta(web) === pdfMeta(cli) && pdfMeta(web).includes("Author: Adsumudi Rechenblattgenerator"),
+      `Web: ${pdfMeta(web)}\n    CLI: ${pdfMeta(cli)}`,
     );
   }
 
