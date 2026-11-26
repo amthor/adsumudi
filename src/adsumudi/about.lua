@@ -56,15 +56,15 @@ local USAGETERMS = "Dieses Blatt ist gemeinfrei (CC0 1.0) und darf ohne Einschr√
 --- Full metadata.
 --- @type about
 local M = {
-    name = NAME,
-    version = VERSION,
-    description = DESCRIPTION,
-    developer = DEVELOPER,
-    urlproject = URLPROJECT,
-    urlweb = URLWEB,
-    pdfsubject = CREATEDBY .. ". " .. USAGETERMS,
-    pdfauthor = DESCRIPTION, -- reusing the short description,
-    pdfcreator = DESCRIPTION, -- reusing the short description
-    usageterms = USAGETERMS,
+	name = NAME,
+	version = VERSION,
+	description = DESCRIPTION,
+	developer = DEVELOPER,
+	urlproject = URLPROJECT,
+	urlweb = URLWEB,
+	pdfsubject = CREATEDBY .. ". " .. USAGETERMS,
+	pdfauthor = DESCRIPTION, -- reusing the short description,
+	pdfcreator = DESCRIPTION, -- reusing the short description
+	usageterms = USAGETERMS,
 }
 return M

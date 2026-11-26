@@ -65,12 +65,12 @@
   // - links (erste Seite): Adsumudi-Hinweis
   // - Mitte: "Seite / Seitenzahl"
   // - rechts (erste Seite): Blattcode
-  // Wie bei LaTeX (fancyhdr) stehen alle drei Teile auf einer gemeinsamen
-  // Grundlinie, eine zweite Zeile hängt darunter. Dafür beginnen und enden die
-  // Zeilenboxen an der Grundlinie: Oben bündige Zellen haben so dieselbe erste
-  // Grundlinie, und `leading` ist genau der Grundlinienabstand (LaTeX
+  // Wie bei LaTeX/fancyhdr stehen alle drei Teile auf einer gemeinsamen
+  // Grundlinie, eine zweite Zeile hängt darunter. Dafür ist es erforderlich, dass die
+  // Zeilenboxen an der Grundlinie beginnen und enden -> Zellen, die am oberen Rand bündig gesetzt sind, haben so dieselbe erste
+  // Grundlinie bzw. `leading` ist genau der Grundlinienabstand (= LaTeX
   // \scriptsize: 9.5pt). Die Grundlinie liegt dann direkt am unteren
-  // Satzspiegelrand; `footer-descent` senkt sie um LaTeX' \footskip (30pt).
+  // Satzspiegelrand. `footer-descent` senkt sie um LaTeX' \footskip (30pt).
   footer-descent: 30pt,
   footer: context {
     set text(top-edge: "baseline", bottom-edge: "baseline")
