@@ -12,3 +12,6 @@ node_modules/
 
 # web app build
 web/dist/
+
+# archived files
+archive/
