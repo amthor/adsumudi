@@ -48,11 +48,11 @@
   description: daten.metadaten.betreff,
 )
 
-// Seitenrand unten und Spaltenabstand (auch für Platzberechnung in `aufgabenblock()`
+// Seitenrand unten und Spaltenabstand
 #let rand-unten = 2cm
 #let spaltenabstand = 1.5cm
 
-// Gleich breite Ziffern ("tabular"), damit Zahlen sauber untereinander stehen
+// Gleich breite Ziffern ("tabular") -> Zahlen bündig untereinander
 #set text(font: "Fira Sans", size: 14pt, lang: "de", number-width: "tabular")
 
 #set page(
@@ -62,21 +62,33 @@
   // -> in Typst Versalhöhe ≈ 9.6pt)
   margin: (top: 2cm + 4.4pt, bottom: rand-unten, rest: 2cm),
   // Fußzeile:
-  // - links: Adsumudi-Hinweis
+  // - links (erste Seite): Adsumudi-Hinweis
   // - Mitte: "Seite / Seitenzahl"
-  // - rechts: Blattcode (nur erste Seite)
-  footer: context grid(
-    columns: (1fr, auto, 1fr),
-    if here().page() == 1 {
-      text(
-        size: 8pt,
-      )[Erstellt mit #emph(daten.metadaten.name) #daten.metadaten.version \ #underline([#link(daten.metadaten.benutzerwebseite.url)[#daten.metadaten.benutzerwebseite.text]])]
-    },
-    counter(page).display("1 / 1", both: true),
-    align(right, if here().page() == 1 and daten.blattcode != none {
-      text(size: 10pt)[Blattcode: #daten.blattcode]
-    }),
-  ),
+  // - rechts (erste Seite): Blattcode
+  // Wie bei LaTeX (fancyhdr) stehen alle drei Teile auf einer gemeinsamen
+  // Grundlinie, eine zweite Zeile hängt darunter. Dafür beginnen und enden die
+  // Zeilenboxen an der Grundlinie: Oben bündige Zellen haben so dieselbe erste
+  // Grundlinie, und `leading` ist genau der Grundlinienabstand (LaTeX
+  // \scriptsize: 9.5pt). Die Grundlinie liegt dann direkt am unteren
+  // Satzspiegelrand; `footer-descent` senkt sie um LaTeX' \footskip (30pt).
+  footer-descent: 30pt,
+  footer: context {
+    set text(top-edge: "baseline", bottom-edge: "baseline")
+    set par(leading: 9.5pt)
+    grid(
+      columns: (1fr, auto, 1fr),
+      if here().page() == 1 {
+        text(size: 8pt)[
+          Erstellt mit #emph(daten.metadaten.name) #daten.metadaten.version \
+          #underline(link(daten.metadaten.benutzerwebseite.url, daten.metadaten.benutzerwebseite.text))
+        ]
+      },
+      counter(page).display("1 / 1", both: true),
+      align(right, if here().page() == 1 and daten.blattcode != none {
+        text(size: 10pt)[Blattcode: #daten.blattcode]
+      }),
+    )
+  },
 )
 
 // Debug-Modus (eine "Show-Regel" auf das ganze Dokument)
