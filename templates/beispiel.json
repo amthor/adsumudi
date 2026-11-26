@@ -90,5 +90,21 @@
       "a":46,
       "b":17,
       "ergebnis":29
-    }]
+    }],
+  "metadaten":{
+    "name":"Adsumudi",
+    "version":"1.1.0",
+    "betreff":"Adsumudi Rechenblattgenerator",
+    "autor":"Adsumudi Rechenblattgenerator",
+    "ersteller":"Adsumudi Rechenblattgenerator",
+    "entwicklerwebseite":{
+      "url":"https://github.com/amthor/adsumudi/",
+      "text":"github.com/amthor/adsumudi"
+    },
+    "benutzerwebseite":{
+      "url":"https://amthor.github.io/adsumudi/",
+      "text":"amthor.github.io/adsumudi"
+    },
+    "nutzungsbedingungen":"Dieses Blatt ist gemeinfrei (CC0 1.0) und darf ohne Einschränkung verwendet werden."
+  }
 }

@@ -1,33 +1,54 @@
 // Adsumudi – Typst-Template
 //
 // Die Daten kommen als JSON von Lua (src/adsumudi/typst.lua) über
-//   typst compile --input daten='<json>' adsumudi.typ blatt.pdf
-// Ohne --input wird beispiel.json verwendet, damit sich das Layout direkt
-// bearbeiten und live ansehen lässt:
-//   typst watch --font-path fonts templates/adsumudi.typ
-// beispiel.json neu erzeugen:
-//   lua adsumudi.lua -t 5 -s 4711 -l --quelle -o templates/beispiel.json
+// `typst compile --input daten='<json>' adsumudi.typ blatt.pdf`.
 //
-// Felder: titel, beschreibung, minuten (Text oder none), blattcode (Text oder
-// none), stellen, debug, seiten ((loesung: bool), …),
-// aufgaben ((art: "add"|"sub"|"mul"|"div", a, b, ergebnis), …)
+// ## Layout bearbeiten
+//
+// Damit sich das Layout direkt bearbeiten und live ansehen lässt, `--input`
+// weglassen:
+//
+// ```bash
+//   typst watch --font-path fonts templates/adsumudi.typ
+// ```
+//
+// Danach beispiel.json neu erzeugen:
+//
+// ```bash
+// lua adsumudi.lua -t 5 -s 4711 -l --quelle -o templates/beispiel.json
+// ```
+//
+// Felder:
+// - `titel`
+// - `version`
+// - `beschreibung`
+// - `minuten` (Text oder none)
+// - `blattcode` (Text oder none)
+// - `stellen`
+// - `debug`
+// - `seiten` -> `((loesung: bool), …)`,
+// - `aufgaben` -> `((art: "add"|"sub"|"mul"|"div", a, b, ergebnis), …)`
 
-// ---------------------------------------------------------------------------
-// Daten
-// ---------------------------------------------------------------------------
+//
+// === Daten ===
+//
 #let daten = if "daten" in sys.inputs {
   json(bytes(sys.inputs.daten))
 } else {
   json("beispiel.json")
 }
 
-// ---------------------------------------------------------------------------
-// Grundeinstellungen: Schrift, Seite, Fußzeile
-// ---------------------------------------------------------------------------
-#set document(title: daten.titel)
+//
+// === Grundeinstellungen ===
+// (Schrift, Seite, Fußzeile)
+//
+#set document(
+  title: daten.titel,
+  author: daten.metadaten.name,
+  description: daten.metadaten.betreff,
+)
 
-// Seitenrand unten und Spaltenabstand; werden auch für die Platzberechnung
-// in aufgabenblock() gebraucht.
+// Seitenrand unten und Spaltenabstand (auch für Platzberechnung in `aufgabenblock()`
 #let rand-unten = 2cm
 #let spaltenabstand = 1.5cm
 
@@ -36,13 +57,21 @@
 
 #set page(
   paper: "a4",
-  // Oben + 4.4pt: LaTeX setzt die erste Grundlinie \topskip (14pt) unter den
-  // Satzspiegel, Typst die Versalhöhe (≈ 9.6pt) – so steht alles wie im LaTeX-Blatt.
+  // Oben + 4.4pt: Einheitlichkeit zwischen Typst und LaTeX
+  // (LaTeX setzt erste Grundlinie \topskip (14pt) unter den Satzspiegel
+  // -> in Typst Versalhöhe ≈ 9.6pt)
   margin: (top: 2cm + 4.4pt, bottom: rand-unten, rest: 2cm),
-  // Fußzeile: mittig "Seite / Seitenzahl", rechts der Blattcode nur auf Seite 1
+  // Fußzeile:
+  // - links: Adsumudi-Hinweis
+  // - Mitte: "Seite / Seitenzahl"
+  // - rechts: Blattcode (nur erste Seite)
   footer: context grid(
     columns: (1fr, auto, 1fr),
-    [],
+    if here().page() == 1 {
+      text(
+        size: 8pt,
+      )[Erstellt mit _Adsumudi_ #daten.metadaten.version \ #underline([#link(daten.metadaten.benutzerwebseite.url)[#daten.metadaten.benutzerwebseite.text]])]
+    },
     counter(page).display("1 / 1", both: true),
     align(right, if here().page() == 1 and daten.blattcode != none {
       text(size: 10pt)[Blattcode: #daten.blattcode]
@@ -50,10 +79,7 @@
   ),
 )
 
-// Debug-Modus (--debug): alle Boxen rot, Blöcke grün, Grid-Zellen blau
-// umrahmen. Eine "Show-Regel" auf das ganze Dokument. Ausdrücklich gesetzte
-// Rahmenseiten (der Unterstrich von linie()) bleiben, die übrigen Seiten
-// ergänzt Typst aus der Set-Regel ("Folding").
+// Debug-Modus (eine "Show-Regel" auf das ganze Dokument)
 #show: body => if daten.debug {
   set box(stroke: 0.3pt + red)
   set block(stroke: 0.3pt + green)
@@ -63,43 +89,46 @@
   body
 }
 
-// ---------------------------------------------------------------------------
-// Bausteine
-// ---------------------------------------------------------------------------
+//
+// === Bausteine ===
+//
 
-// Rechenzeichen: echte Textzeichen aus Fira Sans (U+2212 ist das Minus,
-// U+00B7 der Malpunkt) – in SemiBold statt künstlich gefettet.
+// == Rechenzeichen ==
 #let zeichen = (add: "+", sub: "−", mul: "·", div: ":")
 
-// Unterstrichene Leerstelle (Antwortlücke, Name, Datum)
+// == Formularfelder ==
+// (Antwortlücke, Name, Datum)
 #let linie(breite) = box(width: breite, stroke: (bottom: 0.5pt), outset: (bottom: 3pt))
 
-// Zahlenbox: angenommene Ziffernbreite mal maximale Stellenzahl,
-// für alle Aufgaben gleich breit
+// == Zahlenbox ==
+// (Annahme: Ziffernbreite mal maximale Stellenzahl für alle Aufgaben gleich)
 #let ziffernbreite = 0.7em
 #let zahlbreite = daten.stellen * ziffernbreite
 #let zahl(n) = box(width: zahlbreite, align(center, str(n)))
 
-// Breiten der übrigen Bausteine einer Aufgabe
+// == Breiten ==
+// (übrige Bausteine einer Aufgabe)
 #let einzug = 1em
 #let zeichenbreite = 0.6cm
 #let gleichbreite = 0.8cm
 #let lueckenbreite = 2.2cm
 #let aufgabenbreite = einzug + 2 * zahlbreite + zeichenbreite + gleichbreite + lueckenbreite
 
-// Eine Aufgabe: a ∘ b = ___ (bzw. = Ergebnis auf der Lösungsseite).
+// == Aufgabe ==
 // Die feste Gesamtbreite verhindert einen Umbruch innerhalb der Aufgabe:
 // eine Box ohne Breite wäre höchstens spaltenbreit und bräche intern um.
 #let aufgabe(a, loesung) = box(width: aufgabenbreite, {
   h(einzug)
   zahl(a.a)
+  // Operatorenzeichen gut sichtbar -> semibold
   box(width: zeichenbreite, align(center, text(weight: "semibold", zeichen.at(a.art))))
   zahl(a.b)
   box(width: gleichbreite, align(center)[=])
   if loesung { strong(str(a.ergebnis)) } else { linie(lueckenbreite) }
 })
 
-// Seitenkopf mit Name/Datum, Titel und Beschreibung
+// == Seitenkopf ==
+// (Name/Datum, Titel, Beschreibung)
 #let kopf(titel) = {
   [Name: #linie(6cm) #h(1fr) Datum: #linie(3.5cm)]
   v(1cm)
@@ -111,12 +140,14 @@
   v(1.15cm)
 }
 
-// Aufgaben in zwei Spalten. Typst gleicht Spalten nicht automatisch aus
-// (anders als LaTeX' multicols). Darum:
-//  - Passt die linke Hälfte in den freien Platz der Seite, wird die Liste
-//    halbiert und nebeneinander gesetzt; die rechte Liste zählt weiter.
-//  - Sonst fließen die Aufgaben spaltenweise über mehrere Seiten
-//    (Seite 1 links, Seite 1 rechts, Seite 2 links, ...).
+// == Textkörper ==
+//
+// Aufgaben in zwei Spalten. Spaltenausgleich am Ende:
+//
+// - Linke Hälfte passt in den freien Platz der Seite -> Liste halbieren und
+//   nebeneinander setzen (rechte Liste zählt weiter)
+// - Sonst: Aufgaben fließen spaltenweise über mehrere Seiten
+//   (Seite 1 links, Seite 1 rechts, Seite 2 links, ...)
 #let aufgabenblock(loesung) = {
   set enum(numbering: n => text(size: 12pt)[(#n.)], spacing: 2em + 1pt, indent: 6.6pt)
   let items = daten.aufgaben.map(a => aufgabe(a, loesung))
@@ -131,8 +162,7 @@
       grid(
         columns: (1fr, 1fr),
         column-gutter: spaltenabstand,
-        links,
-        enum(start: haelfte + 1, ..items.slice(haelfte)),
+        links, enum(start: haelfte + 1, ..items.slice(haelfte)),
       )
     } else {
       columns(2, gutter: spaltenabstand, enum(..items))
@@ -140,9 +170,9 @@
   })
 }
 
-// ---------------------------------------------------------------------------
-// Dokument
-// ---------------------------------------------------------------------------
+//
+// === Dokument ===
+//
 #for (i, seite) in daten.seiten.enumerate() {
   if i > 0 { pagebreak() }
   kopf(if seite.loesung { daten.titel + " – Lösungen" } else { daten.titel })
