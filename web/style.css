@@ -144,7 +144,8 @@ body {
   column-gap: 16px;
 }
 
-.masthead > div {
+/* Dissolves the title block, so heading and tagline sit in the grid directly. */
+.masthead > .masthead-title {
   display: contents;
 }
 
@@ -152,10 +153,21 @@ body {
   grid-column: 1 / -1;
 }
 
-.masthead .theme-switch {
+.masthead .masthead-tools {
   grid-row: 1;
   grid-column: 2;
   justify-self: end;
+}
+
+/* Heading, link and switch need about 360px side by side: on narrow phones the
+   buttons get their own row below the tagline. */
+@media (max-width: 419px) {
+  .masthead .masthead-tools {
+    grid-row: 3;
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin-top: 12px;
+  }
 }
 
 .masthead h1 {
@@ -163,6 +175,12 @@ body {
   font-size: 2rem;
   font-weight: 700;
   line-height: 1.1;
+}
+
+.masthead-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .tagline {
@@ -209,6 +227,29 @@ body {
 .theme-switch label:has(input:checked) {
   background: var(--accent);
   color: var(--accent-contrast);
+}
+
+/* A circle as high as the theme switch (38px + 2 × 3px padding + 2 × 1.5px
+   border), above the 44px minimum of a touch target. */
+.repo-link {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 47px;
+  height: 47px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.repo-link:hover {
+  color: var(--ink);
+}
+
+.repo-link svg {
+  width: 20px;
+  height: 20px;
 }
 
 /* Form ------------------------------------------------------------------- */
@@ -298,7 +339,8 @@ fieldset:disabled .segmented {
 
 .chip:has(input:focus-visible),
 .segmented label:has(input:focus-visible),
-.theme-switch label:has(input:focus-visible) {
+.theme-switch label:has(input:focus-visible),
+.repo-link:focus-visible {
   outline: 2px solid var(--accent-text);
   outline-offset: 2px;
 }
