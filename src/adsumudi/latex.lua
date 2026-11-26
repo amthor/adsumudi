@@ -90,6 +90,7 @@ end
 function M.render(sheet, presentation)
 	local data = view.build(sheet, presentation) --[[@as LatexView]]
 	data.titel = M.escape(data.titel)
+	data.metadaten.betreff = M.escape(data.metadaten.betreff)
 	data.blattcode = data.blattcode and M.escape(data.blattcode)
 	data.operator = OPERATOR
 	return template()(data)

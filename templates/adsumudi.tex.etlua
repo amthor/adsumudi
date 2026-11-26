@@ -5,13 +5,19 @@
 \usepackage{enumitem}
 \usepackage{fancyhdr}
 \usepackage{lastpage}
-% Schrift (lualatex): Fira Sans für Text, passend Fira Math für Zahlen und Rechenzeichen
+% Schrift (lualatex): Fira Sans/Fira Math
 \usepackage{fontspec}
 \usepackage{unicode-math}
 <% if debug then %>
-% Debug-Modus (--debug): Boxen, Glue und Kerns sichtbar machen
+% Debug-Modus (--debug): Boxen sichtbar machen
 \usepackage{lua-visual-debug}
 <% end %>
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+  pdftitle={<%- titel %>},
+  pdfauthor={<%- metadaten.autor %>},
+  pdfsubject={<%- metadaten.betreff %>},
+}
 \setmainfont{Fira Sans}
 \setmathfont{Fira Math}
 % Kräftigere Rechenzeichen: eigene Mathe-Version mit künstlicher Fettung (nur für \aufgabe-Operatoren)
@@ -24,6 +30,10 @@
 % Erste Seite: zusätzlich rechts der Blattcode (Seed)
 \fancypagestyle{ersteseite}{%
   \fancyhf{}%
+  \lfoot{%
+    \scriptsize Erstellt mit \emph{<%- metadaten.name %>} <%- metadaten.version %>\\%
+    \underline{\href{<%- metadaten.benutzerwebseite.url %>}{<%- metadaten.benutzerwebseite.text %>}}%
+  }%
   \cfoot{\thepage\ / \pageref{LastPage}}%
 <% if blattcode then %>
   \rfoot{\footnotesize Blattcode: <%- blattcode %>}%
