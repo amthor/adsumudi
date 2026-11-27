@@ -158,8 +158,8 @@ Funktionen:
   und Erzeugungszeiten
 
 `web/dist/` enthält Kopien des Lua-Codes, Template und Schriften aus dem
-Repository. Initial sind ca. 30 MB zu laden (vorwiegend Typst-Compiler), danach
-alles aus dem Browser-Cache.
+Repository. `web/dist/vendor/` enthält Kopien der Lizenztexte dritter Parteien
+(s. [Lizenz](#lizenz)).
 
 ## Geplante Erweiterungen
 
@@ -173,13 +173,13 @@ alles aus dem Browser-Cache.
 
 ## Lizenz
 
-Adsumudi selbst steht unter [MIT-Lizenz](LICENSE). Folgende mitgelieferten
-Teile benutzen jeweils eigene Lizenzen:
+Adsumudi steht unter [MIT-Lizenz](LICENSE). Teile der Software stehen davon
+abweichend unter folgenden Lizenzbestimmungen:
 
 - Fira Sans (`fonts/`): SIL Open Font License 1.1 (`fonts/OFL.txt`)
 - dkjson (`dkjson/`): MIT, Copyright David Heiko Kolf
-- [Wasmoon] (MIT) für die Web-Oberfläche und [typst.ts] (Apache-2.0) aus npm
-  (Lizenztexte nach dem Build in `web/dist/vendor/`)
+- [Wasmoon]: MIT
+- [typst.ts]: Apache-2.0 "Lizenztexte nach dem Build in `web/dist/vendor/`"
 
 ## KI-Transparenzhinweis
 
