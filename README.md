@@ -179,7 +179,7 @@ abweichend unter folgenden Lizenzbestimmungen:
 - Fira Sans (`fonts/`): SIL Open Font License 1.1 (`fonts/OFL.txt`)
 - dkjson (`dkjson/`): MIT, Copyright David Heiko Kolf
 - [Wasmoon][]: MIT
-- [typst.ts][]: Apache-2.0 "Lizenztexte nach dem Build in `web/dist/vendor/`"
+- [typst.ts][]: Apache-2.0
 
 ## KI-Transparenzhinweis
 
